@@ -1,17 +1,23 @@
-import { Body, Controller, Delete, Get,HttpStatus,Param,Post, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get,HttpStatus,Param,Post, Req, Request, Res, UseGuards } from '@nestjs/common';
 import { GroupService } from './group.service';
 import {  CreateGroupDto} from 'src/Dto/createGroup.dto';
 import { Response } from 'express';
+import axios from 'axios';
+import { AuthService } from 'src/auth/auth.service';
+import { AuthGuard } from 'src/auth/auth.gurad';
+import { AdminGuard } from 'src/auth/admin.gurad';
+import { ProfGuard } from 'src/auth/prof.gurad';
 
 @Controller('group')
 export class GroupController {
     constructor(private readonly groupService:GroupService){}
    
    //create group in specific group container
-    @Post('/createGroup/:idProf/:idGC')
-    async createGroup(@Param("idProf") idProf:string, @Param('idGC') idGC:string,@Body()creategroupDto:CreateGroupDto,@Res() res:Response){
+    @Post('/createGroup/:idGC')
+    @UseGuards(AuthGuard,ProfGuard)
+    async createGroup(@Request() request, @Param('idGC') idGC:string,@Body()creategroupDto:CreateGroupDto,@Res() res:Response){
         const existingGroup=await this.groupService.findGroupInConatiner(idGC,creategroupDto.groupName)
-        const existingStartingDates=await this.groupService.getDates(idProf)
+        const existingStartingDates=await this.groupService.getDates(request.prof)
 
         const dates=[]
         creategroupDto.startingDate.forEach((e)=>{
@@ -119,6 +125,14 @@ async getGroupsOfSessionForProf(@Param("idProf") idStudent:string,@Res() res:Res
     }catch(err){
         console.log(err)
     }
+}
+
+
+
+@Get('/test')
+@UseGuards(AuthGuard,ProfGuard)
+async communication(@Request() request){
+   return this.groupService.getMessage(request.prof)
 }
 
 

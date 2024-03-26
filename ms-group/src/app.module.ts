@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { EurekaModule } from 'nestjs-eureka';
 import { SessionModule } from './session/session.module';
 import { DocumentModule } from './document/document.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [GroupModule,
     ConfigModule.forRoot(
@@ -19,7 +20,21 @@ import { DocumentModule } from './document/document.module';
     
     SessionModule,
     
-    DocumentModule
+    DocumentModule,
+    EurekaModule.forRoot({
+      eureka:{
+        host: 'localhost',
+        port: 8888,
+        registryFetchInterval: 1000,
+        maxRetries: 3,
+      },
+      service:{
+        name:"ms-group",
+        port:3001
+      }
+    }),
+    AuthModule, 
+    
 
   ],
   controllers: [AppController],

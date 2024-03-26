@@ -5,11 +5,14 @@ import { Group } from 'src/Entity/group.schema';
 import { CreateGroupDto } from 'src/Dto/createGroup.dto';
 import { GroupContainer } from 'src/Entity/groupContainer';
 import { group } from 'console';
+import { EurekaModule } from 'nestjs-eureka';
+
 
 @Injectable()
 export class GroupService {
     constructor(@InjectModel(Group.name) private groupModel:Model<Group>,
                 @InjectModel(GroupContainer.name) private groupContainer:Model<GroupContainer>
+
        ){}
 
     async getGroups():Promise<Group[]>{
@@ -233,7 +236,16 @@ export class GroupService {
             console.log(err)
         }
     }
+
+    async getMessage(id:string){
+        try{
+            return `the communication is work and the admin id ${id}`
+        }catch(err) {
+            console.log(err)
+        }
+    }
     
+   
     
 }
     

@@ -6,11 +6,18 @@ import { User, UserSchema } from 'src/schemas/User.schema';
 import { Prof, ProfSchema } from 'src/schemas/Prof.schema';
 import { Student, StudentSchema } from 'src/schemas/Student.schema';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 
 @Module({
   controllers: [AuthController],
-  imports:[JwtModule.register({
+  imports:[ConfigModule.forRoot(
+    {
+      envFilePath: '.env',
+      isGlobal: true
+    }
+  ),
+  JwtModule.register({
     global: true,
     secret: process.env.JWT_SECRET,
     signOptions: { expiresIn: '24h' },

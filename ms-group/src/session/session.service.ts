@@ -25,7 +25,6 @@ export class SessionService {
             studyDuration:CreateGcDto.studyDuration,
             sessionDuration:CreateGcDto.sessionDuration,
             valide:false
-
         })
 
         return await newGroupContainer.save()
