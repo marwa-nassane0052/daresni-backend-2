@@ -124,9 +124,6 @@ export class GroupService {
         return mainTable.filter(date => smallTable.some(d => d.getTime() === date.getTime()));}
 
 
-     //upload file in the group
-
-     //upload vidio
 
      //add student in the group
      async addStudent(idStudent:string,idGC:string,idGroup:string){
@@ -206,29 +203,35 @@ export class GroupService {
     }
 
     //returne the planing for a student
-    async getStudentPlaning(idStudent:string){
-        try{
-        const groups = await this.groupModel.find({ studentList: idStudent });
-        const palning=[]
-        groups.forEach((g)=>{
-            g.planing.forEach((p)=>{
-                p.dates.forEach((t)=>{
-                    palning.push(t)
-                })
-                
-            })
-        })
-        return palning
-
-        }catch(err){
-            console.log(err)
+    async getStudentPlaning(idStudent: string) {
+        try {
+            const groups = await this.groupModel.find({ studentList: idStudent });
+            const planning = [];
+    
+            for (const g of groups) {
+                const groupContainer = await this.groupContainer.findById(g.groupContainer);
+    
+                await Promise.all(g.planing.map(async (p) => {
+                    await Promise.all(p.dates.map(async (t) => {
+                        planning.push({
+                            date: t,
+                            info:`group name : ${g.groupName} module: ${groupContainer.moduleName}`,
+                        });
+                    }));
+                }));
+            }
+    
+            return planning;
+        } catch (err) {
+            console.log(err);
+            throw err;
         }
     }
+    
 
     //returne the groups for specifi session and specic prof
     async getGropsOfGcBYIdProf(idGc:string){
         try{
-        
         const groups=await this.groupModel.find({groupContainer:idGc})
         return groups
 
@@ -244,9 +247,31 @@ export class GroupService {
             console.log(err)
         }
     }
-    
-   
-    
+    //prof palning with details about each date
+    async getProfPlaning(profId:string){
+        try{
+            const groupConatners=await this.groupContainer.find({profId:profId})
+            var planning=[]
+            for(const gc of groupConatners){
+                for (const g of gc.groups){
+                    const group=await this.groupModel.findById(g)
+                    await Promise.all(group.planing.map(async (p) => {
+                        await Promise.all(p.dates.map(async (t) => {
+                            planning.push({
+                                date: t,                                
+                                info:`group name: ${group.groupName} module:${gc.moduleName} level: ${gc.level} year: ${gc.year} speciality: ${gc.speciality}`
+                            });
+                        }));
+                    }));
+
+                } 
+            
+            }
+            return planning
+        }catch(err){
+            console.log(err)
+        }
+    }  
 }
     
   

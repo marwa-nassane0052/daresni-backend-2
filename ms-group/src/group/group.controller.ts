@@ -1,16 +1,25 @@
 import { Body, Controller, Delete, Get,HttpStatus,Param,Post, Req, Request, Res, UseGuards } from '@nestjs/common';
 import { GroupService } from './group.service';
 import {  CreateGroupDto} from 'src/Dto/createGroup.dto';
-import { Response } from 'express';
-import axios from 'axios';
-import { AuthService } from 'src/auth/auth.service';
+import {   Response } from 'express';
 import { AuthGuard } from 'src/auth/auth.gurad';
-import { AdminGuard } from 'src/auth/admin.gurad';
 import { ProfGuard } from 'src/auth/prof.gurad';
+import { StudentGurad } from 'src/auth/student.gurad';
+import { ProducerService } from 'src/kafka/producer/producer.service';
 
 @Controller('group')
 export class GroupController {
-    constructor(private readonly groupService:GroupService){}
+   
+
+    constructor(private readonly groupService:GroupService,
+               private readonly producerService:ProducerService        
+        ){
+        
+    }
+
+
+   
+
    
    //create group in specific group container
     @Post('/createGroup/:idGC')
@@ -38,13 +47,16 @@ export class GroupController {
    
     //add student in group
     @Post('/addStudent')
-    async addStudentToGRoup(@Body() requireData:{idStudent:string,idGC:string,idGroup:string},@Res() res:Response){
+    @UseGuards(AuthGuard,StudentGurad)
+    async addStudentToGRoup(@Body() requireData:{idGC:string,idGroup:string},@Request() request,@Res() res:Response){
+
         try{
+            const idStudent=request.student
             const isGroupComplete=await this.groupService.getStudentNumberIngroup(requireData.idGC,requireData.idGroup)
             if(isGroupComplete){
                return res.status(HttpStatus.FORBIDDEN).json({msg:"ce groupe est complete tu ne peux pas ajouter d'autre etudiant"})
             }
-            const resulte= await this.groupService.addStudent(requireData.idStudent,requireData.idGC,requireData.idGroup)
+            const resulte= await this.groupService.addStudent(idStudent,requireData.idGC,requireData.idGroup)
           
             return res.status(HttpStatus.ACCEPTED).json(resulte)
             /* return res.status(HttpStatus.OK).json("etudiant a été ajouté dans  ce group group avec succès")*/
@@ -67,9 +79,11 @@ export class GroupController {
     }
     
     //returen by id student the the detila of its groups
-    @Get("/studentGroup/:idStudent")
-    async getGroupsOfStudent(@Param("idStudent") idStudent:string,@Res() res:Response){
+    @Get("/studentGroups")
+    @UseGuards(AuthGuard,StudentGurad)
+    async getGroupsOfStudent(@Request() request,@Res() res:Response){
         try{
+            const idStudent=request.student
             const studentGroups=await this.groupService.getGroupDetailOfSTudent(idStudent)
             return res.status(HttpStatus.OK).json(studentGroups)
 
@@ -79,9 +93,11 @@ export class GroupController {
     }
 
     //returne the session of the student
-    @Get("/studentGroupContainer/:idStudent")
-    async getGroupsContainerOfStudent(@Param("idStudent") idStudent:string,@Res() res:Response){
+    @Get("/studentGroupContainers")
+    @UseGuards(AuthGuard,StudentGurad)
+    async getGroupsContainerOfStudent(@Request() request,@Res() res:Response){
         try{
+            const idStudent=request.student
             const studentGroupsContainer=await this.groupService.getGroupsContainerOfStudent(idStudent)
             return res.status(HttpStatus.OK).json(studentGroupsContainer)
 
@@ -90,10 +106,12 @@ export class GroupController {
         }
     }
 
-    //returen the planing of student
-    @Get("/studentPlaning/:idStudent")
-    async getPlaningOfStudent(@Param("idStudent") idStudent:string,@Res() res:Response){
+    //returen the planing of student (by id student)
+    @Get("/studentPlaning")
+    @UseGuards(AuthGuard,StudentGurad)
+    async getPlaningOfStudent(@Request() request,@Res() res:Response){
         try{
+            const idStudent=request.student
             const studentPlaning=await this.groupService.getStudentPlaning(idStudent)
             return res.status(HttpStatus.OK).json(studentPlaning)
 
@@ -102,11 +120,13 @@ export class GroupController {
         }
     }
   
-    //returne a planing for a specific prof
-    @Get("/profPlaning/:idProf")
-    async getPlaningOfProf(@Param("idProf") idStudent:string,@Res() res:Response){
+    //returne a planing for a specific prof(by id Prof)
+    @Get("/profPlaning")
+    @UseGuards(AuthGuard,ProfGuard)
+    async getPlaningOfProf(@Request() request,@Res() res:Response){
         try{
-            const profPlaning=await this.groupService.getDates(idStudent)
+            const idProf=request.prof
+            const profPlaning=await this.groupService.getProfPlaning(idProf)
             return res.status(HttpStatus.OK).json(profPlaning)
 
         }catch(err){
@@ -115,11 +135,11 @@ export class GroupController {
     }
 
 //in prof dashbord to returne for each session the list of groups
-    
-@Get("/profGroup/:idProf")
-async getGroupsOfSessionForProf(@Param("idProf") idStudent:string,@Res() res:Response){
+@Get("/profGroup/:idGC")
+@UseGuards(AuthGuard,ProfGuard)
+async getGroupsOfSessionForProf(@Param("idGC") idGC:string,@Res() res:Response){
     try{
-        const groups=await this.groupService.getGropsOfGcBYIdProf(idStudent)
+        const groups=await this.groupService.getGropsOfGcBYIdProf(idGC)
         return res.status(HttpStatus.OK).json(groups)
 
     }catch(err){
@@ -130,10 +150,45 @@ async getGroupsOfSessionForProf(@Param("idProf") idStudent:string,@Res() res:Res
 
 
 @Get('/test')
-@UseGuards(AuthGuard,ProfGuard)
+@UseGuards(AuthGuard,StudentGurad)
 async communication(@Request() request){
-   return this.groupService.getMessage(request.prof)
+   return this.groupService.getMessage(request.student)
 }
+
+@Get('/text2/:name/:age')
+async test2(@Param("name") name:string,@Param("age") age:Number){
+    await this.producerService.produce({
+        topic:'group_cretaed',
+        messages:[
+            {
+                value:JSON.stringify({
+                    groupName:name,
+                    age:age
+                   
+                })
+            }
+        ]
+    })
+    return  name
+}
+
+@Get('/text3/:name')
+async test3(@Param("name") name:string){
+    await this.producerService.produce({
+        topic:'user_creted',
+        messages:[
+            {
+                value:JSON.stringify({
+                    user:name                   
+                })
+            }
+        ]
+    })
+    return  name
+}
+
+
+
 
 
 

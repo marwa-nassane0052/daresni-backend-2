@@ -8,6 +8,8 @@ import { EurekaModule } from 'nestjs-eureka';
 import { SessionModule } from './session/session.module';
 import { DocumentModule } from './document/document.module';
 import { AuthModule } from './auth/auth.module';
+import { ProducerService } from './kafka/producer/producer.service';
+import { KafkaModule } from './kafka/kafka.module';
 @Module({
   imports: [GroupModule,
     ConfigModule.forRoot(
@@ -21,7 +23,19 @@ import { AuthModule } from './auth/auth.module';
     SessionModule,
     
     DocumentModule,
-    EurekaModule.forRoot({
+    AuthModule,
+    KafkaModule, 
+    
+
+  ],
+  controllers: [AppController],
+  providers: [AppService, ProducerService],
+})
+export class AppModule {}
+
+/*
+ 
+  EurekaModule.forRoot({
       eureka:{
         host: 'localhost',
         port: 8888,
@@ -33,26 +47,4 @@ import { AuthModule } from './auth/auth.module';
         port:3001
       }
     }),
-    AuthModule, 
-    
-
-  ],
-  controllers: [AppController],
-  providers: [AppService],
-})
-export class AppModule {}
-/**
-EurekaModule.forRoot({
-      eureka:{
-        host: 'localhost',
-        port: 8888,
-        registryFetchInterval: 10000,
-        maxRetries: 3,
-      },
-      service:{
-        name:"ms-group",
-        port:3000
-      }
-    }), 
-
  */
