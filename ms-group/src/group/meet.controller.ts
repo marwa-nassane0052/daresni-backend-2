@@ -71,7 +71,7 @@ export class MeetController{
 
     const calender=google.calendar({
       version:'v3',
-      auth:process.env.AUTH_SECRET
+      auth:process.env.AUTH
     })
     datesToAdd.forEach(date=>{
         calender.events.insert({
