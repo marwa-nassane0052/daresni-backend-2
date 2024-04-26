@@ -11,7 +11,7 @@ export class ProducerService implements OnModuleInit, OnApplicationShutdown{
     
       async onModuleInit() {
         // Connect Producer on Module initialization
-        await this.producer.connect();
+        /*await this.producer.connect();*/
       }
     
       async produce(record: ProducerRecord) {

@@ -1,6 +1,5 @@
 import { Controller, Get, Req, Res } from "@nestjs/common";
 import { google } from 'googleapis';
-import Data from 'src/data.meet';
 import { Response, Request } from "express";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -10,9 +9,9 @@ export class MeetController{
     private auth:any
     constructor(){
         this.auth=new google.auth.OAuth2(
-            Data.client_id,
-            Data.client_secret,
-            Data.redirect_uris[0]
+          process.env.client_id,
+          process.env.client_secret,
+          process.env.redirect_uris
         )
 
     }
@@ -46,18 +45,18 @@ export class MeetController{
 
     const datesToAdd = [
         {
-            startDateTime: '2024-04-25T19:30:00',
-            endDateTime: '2024-04-28T20:30:00',
+            startDateTime: '2024-05-25T19:30:00',
+            endDateTime: '2024-05-28T20:30:00',
             info:'math cours '
           },
         {
-            startDateTime: '2024-04-24T19:30:00',
-            endDateTime: '2024-04-28T20:30:00',
+            startDateTime: '2024-05-24T19:30:00',
+            endDateTime: '2024-05-28T20:30:00',
             info:'physics cours'
           },
         {
-          startDateTime: '2024-04-29T19:30:00',
-          endDateTime: '2024-04-30T20:30:00',
+          startDateTime: '2024-05-29T19:30:00',
+          endDateTime: '2024-05-30T20:30:00',
           info:'sience cours'
 
         },
@@ -72,7 +71,7 @@ export class MeetController{
 
     const calender=google.calendar({
       version:'v3',
-      auth:'AIzaSyC0pSxhP2g_BsGOzEX_JyyVkG00lUkQFo0'
+      auth:process.env.AUTH_SECRET
     })
     datesToAdd.forEach(date=>{
         calender.events.insert({
