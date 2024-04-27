@@ -9,7 +9,8 @@ export class AuthService {
                 Authorization: token,
               }
         })
-        return data.data
+        
+        return data;
         
     }
     async getAdmin(token:string){
@@ -28,7 +29,7 @@ export class AuthService {
                 Authorization: token,
               }
         })
-        return data.data.id
+        return data.data
     }
 
     async getStudent(token:string){
@@ -37,6 +38,6 @@ export class AuthService {
                 Authorization: token,
               }
         })
-        return data.data.id
+        return data.data
     }
 }

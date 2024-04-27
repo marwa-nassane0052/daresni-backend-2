@@ -26,7 +26,7 @@ export class GroupController {
     @UseGuards(AuthGuard,ProfGuard)
     async createGroup(@Request() request, @Param('idGC') idGC:string,@Body()creategroupDto:CreateGroupDto,@Res() res:Response){
         const existingGroup=await this.groupService.findGroupInConatiner(idGC,creategroupDto.groupName)
-        const existingStartingDates=await this.groupService.getDates(request.prof)
+        const existingStartingDates=await this.groupService.getDates(request.prof.id)
 
         const dates=[]
         creategroupDto.startingDate.forEach((e)=>{
@@ -51,7 +51,7 @@ export class GroupController {
     async addStudentToGRoup(@Body() requireData:{idGC:string,idGroup:string},@Request() request,@Res() res:Response){
 
         try{
-            const idStudent=request.student
+            const idStudent=request.student.id
             const isGroupComplete=await this.groupService.getStudentNumberIngroup(requireData.idGC,requireData.idGroup)
             if(isGroupComplete){
                return res.status(HttpStatus.FORBIDDEN).json({msg:"ce groupe est complete tu ne peux pas ajouter d'autre etudiant"})
@@ -83,7 +83,7 @@ export class GroupController {
     @UseGuards(AuthGuard,StudentGurad)
     async getGroupsOfStudent(@Request() request,@Res() res:Response){
         try{
-            const idStudent=request.student
+            const idStudent=request.student.id
             const studentGroups=await this.groupService.getGroupDetailOfSTudent(idStudent)
             return res.status(HttpStatus.OK).json(studentGroups)
 
@@ -97,7 +97,7 @@ export class GroupController {
     @UseGuards(AuthGuard,StudentGurad)
     async getGroupsContainerOfStudent(@Request() request,@Res() res:Response){
         try{
-            const idStudent=request.student
+            const idStudent=request.student.id
             const studentGroupsContainer=await this.groupService.getGroupsContainerOfStudent(idStudent)
             return res.status(HttpStatus.OK).json(studentGroupsContainer)
 
@@ -111,7 +111,7 @@ export class GroupController {
     @UseGuards(AuthGuard,StudentGurad)
     async getPlaningOfStudent(@Request() request,@Res() res:Response){
         try{
-            const idStudent=request.student
+            const idStudent=request.student.id
             const studentPlaning=await this.groupService.getStudentPlaning(idStudent)
             return res.status(HttpStatus.OK).json(studentPlaning)
 
@@ -125,7 +125,7 @@ export class GroupController {
     @UseGuards(AuthGuard,ProfGuard)
     async getPlaningOfProf(@Request() request,@Res() res:Response){
         try{
-            const idProf=request.prof
+            const idProf=request.prof.id
             const profPlaning=await this.groupService.getProfPlaning(idProf)
             return res.status(HttpStatus.OK).json(profPlaning)
 
@@ -152,7 +152,7 @@ async getGroupsOfSessionForProf(@Param("idGC") idGC:string,@Res() res:Response){
 @Get('/test')
 @UseGuards(AuthGuard,StudentGurad)
 async communication(@Request() request){
-   return this.groupService.getMessage(request.student)
+   return this.groupService.getMessage(request.student.email,request.student.id)
 }
 
 @Get('/text2/:name/:age')

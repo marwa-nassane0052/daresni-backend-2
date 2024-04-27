@@ -1,13 +1,17 @@
-import { Controller, Get, Req, Res } from "@nestjs/common";
+import { Controller, Get, Req, Res, UseGuards } from "@nestjs/common";
 import { google } from 'googleapis';
 import { Response, Request } from "express";
 import { v4 as uuidv4 } from 'uuid';
+import { AuthGuard } from "src/auth/auth.gurad";
+import { ProfGuard } from "src/auth/prof.gurad";
+import { GroupService } from "./group.service";
+import { StudentGurad } from "src/auth/student.gurad";
 
 
 @Controller('')
 export class MeetController{
     private auth:any
-    constructor(){
+    constructor(private readonly groupService:GroupService){
         this.auth=new google.auth.OAuth2(
           process.env.client_id,
           process.env.client_secret,
@@ -40,35 +44,11 @@ export class MeetController{
     return res.json("its work")
   }
 
-  @Get('addDate')
-  async scheduls(@Res() res:Response){
+  @Get('addDateProf')
+  @UseGuards(AuthGuard,ProfGuard)
+  async scheduls(@Res() res:Response,@Req() request){
 
-    const datesToAdd = [
-        {
-            startDateTime: '2024-05-25T19:30:00',
-            endDateTime: '2024-05-28T20:30:00',
-            info:'math cours '
-          },
-        {
-            startDateTime: '2024-05-24T19:30:00',
-            endDateTime: '2024-05-28T20:30:00',
-            info:'physics cours'
-          },
-        {
-          startDateTime: '2024-05-29T19:30:00',
-          endDateTime: '2024-05-30T20:30:00',
-          info:'sience cours'
-
-        },
-        {
-          startDateTime: '2024-04-30T19:30:00',
-          endDateTime: '2024-05-05T20:30:00',
-          info:'physics cours'
-
-        },
-        
-      ];
-
+    const datesToAdd =await this.groupService.getProfPlaning(request.prof.id)
     const calender=google.calendar({
       version:'v3',
       auth:process.env.AUTH
@@ -79,16 +59,16 @@ export class MeetController{
             auth:this.auth,
             conferenceDataVersion:1,
               requestBody: {
-                attendees: [{ email: 'm.nassane@esi-sba.dz' }],
+                attendees: [{ email: request.prof.email }],
                 summary:date.info,
                 description: 'new meet',
                 
                 start: {
-                  dateTime: date.startDateTime,
+                  dateTime: date.StartingDate,
                   timeZone: 'CET',
                 },
                 end: {
-                  dateTime: date.endDateTime,
+                  dateTime:date.endingDate,
                   timeZone: 'CET',
                 },
                 conferenceData:{
@@ -102,7 +82,48 @@ export class MeetController{
 
     })
     
-    return res.send(" finalyyyyy i m ork ")
+    return res.send(" les date sont enregistrées avec succès dans votre calendrier")
+  }
+
+  @Get('addDateStudent')
+  @UseGuards(AuthGuard,StudentGurad)
+  async schedulsStudent(@Res() res:Response,@Req() request){
+
+    const datesToAdd =await this.groupService.getStudentPlaning(request.student.id)
+    const calender=google.calendar({
+      version:'v3',
+      auth:process.env.AUTH
+    })
+    datesToAdd.forEach(date=>{
+        calender.events.insert({
+            calendarId: 'primary',
+            auth:this.auth,
+            conferenceDataVersion:1,
+              requestBody: {
+                attendees: [{ email: request.student.email }],
+                summary:date.info,
+                description: 'new meet',
+                
+                start: {
+                  dateTime: date.StartingDate,
+                  timeZone: 'CET',
+                },
+                end: {
+                  dateTime:date.endingDate,
+                  timeZone: 'CET',
+                },
+                conferenceData:{
+                    createRequest:{
+                    requestId:uuidv4(),
+                  }
+                  
+                }
+              },
+          })
+
+    })
+    
+    return res.send("les date sont enregistrées avec succès dans votre calendrier")
   }
 
 }

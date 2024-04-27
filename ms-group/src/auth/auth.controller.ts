@@ -5,5 +5,6 @@ import { Request } from 'express';
 @Controller('auth')
 export class AuthController {
     constructor (private readonly authservice:AuthService){}
+
     
 }

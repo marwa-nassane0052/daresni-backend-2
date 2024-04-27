@@ -12,8 +12,8 @@ export class ProfGuard implements CanActivate{
             throw new UnauthorizedException();
         }
         try {
-            const prof_id = await this.authService.getProf(token)
-            request.prof=prof_id  
+            const prof_id= await this.authService.getProf(token)
+            request.prof=prof_id
             return true
           } catch(error) {
             console.error("Error in AuthGuard:", error);

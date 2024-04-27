@@ -213,8 +213,10 @@ export class GroupService {
     
                 await Promise.all(g.planing.map(async (p) => {
                     await Promise.all(p.dates.map(async (t) => {
+                        const endingDate = await this.addHoursToDate(t, 6);
                         planning.push({
-                            date: t,
+                            StartingDate: t,
+                            endingDate:endingDate,                             
                             info:`group name : ${g.groupName} module: ${groupContainer.moduleName}`,
                         });
                     }));
@@ -240,9 +242,9 @@ export class GroupService {
         }
     }
 
-    async getMessage(id:string){
+    async getMessage(id:string,email:string){
         try{
-            return `the communication is work and the admin id ${id}`
+            return `the communication is work and the admin id ${id} and ${email}`
         }catch(err) {
             console.log(err)
         }
@@ -257,8 +259,10 @@ export class GroupService {
                     const group=await this.groupModel.findById(g)
                     await Promise.all(group.planing.map(async (p) => {
                         await Promise.all(p.dates.map(async (t) => {
+                            const endingDate = await this.addHoursToDate(t, 6);
                             planning.push({
-                                date: t,                                
+                                StartingDate: t,   
+                                endingDate:endingDate,                             
                                 info:`group name: ${group.groupName} module:${gc.moduleName} level: ${gc.level} year: ${gc.year} speciality: ${gc.speciality}`
                             });
                         }));
@@ -272,6 +276,13 @@ export class GroupService {
             console.log(err)
         }
     }  
+
+
+    async addHoursToDate(originalDate: Date, hoursToAdd: number) {
+        const newDate = new Date(originalDate);
+        newDate.setHours(newDate.getHours() + hoursToAdd);
+        return newDate;
+      }
 }
     
   

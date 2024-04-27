@@ -35,4 +35,7 @@ export class CreateGcDto{
     sessionDuration:Number
     //specify the time 2h or 3h
 
+    @IsEnum(Level)
+    level:String
+
 }
