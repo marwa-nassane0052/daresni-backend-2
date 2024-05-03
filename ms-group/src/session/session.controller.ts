@@ -7,9 +7,12 @@ import { AuthGuard } from 'src/auth/auth.gurad';
 import { ProfGuard } from 'src/auth/prof.gurad';
 import { AdminGuard } from 'src/auth/admin.gurad';
 import { getgroups } from 'process';
+import { ProducerService } from 'src/kafka/producer/producer.service';
 @Controller('session')
 export class SessionController {
-    constructor(private readonly groupCntainerService:SessionService){}
+    constructor(private readonly groupCntainerService:SessionService,
+        private readonly producerService:ProducerService  
+         ){}
 
     @Get('/allGroupsContainer')
     async getAllGroupContainers(){
@@ -22,11 +25,31 @@ export class SessionController {
     async createGroupContainerCem(@Body() CreateGcDto:CreateGcDto,@Res() res:Response,@Request() request){
        
            try{ 
+               
                 const gorupContainer=await this.groupCntainerService.findGroupContainer(request.prof.id,CreateGcDto)
                 if(gorupContainer){
                     return res.status(HttpStatus.CONFLICT).json("vous ne pouvez pas créer deux session avec les meme information")
                 }else{
-                    const createGc= await this.groupCntainerService.createGroupContainerCem(request.prof,CreateGcDto)
+                    const createGc= await this.groupCntainerService.createGroupContainerCem(request.prof.id,CreateGcDto)
+                    await this.producerService.produce({
+                        topic:'croupContainer_created',
+                        messages:[
+                            {
+                                value:JSON.stringify({
+                                    moduleName:createGc.moduleName,
+                                    profId:createGc.profId,
+                                    level:createGc.level,
+                                    year:createGc.year,  
+                                    studentNumber:createGc.studentNumber,
+                                    price:createGc.price,
+                                    sessionsNumberPerWeek:createGc.sessionsNumberPerWeek,
+                                    studyDuration:createGc.studyDuration,
+                                    sessionDuration:createGc.sessionDuration,
+                                    
+                                })
+                            }
+                        ]
+                    })
                    return res.status(HttpStatus.CREATED).json(createGc)
                 }
              }catch(err){
@@ -45,7 +68,18 @@ export class SessionController {
             if(gorupContainer){
                     return res.status(HttpStatus.CONFLICT).json("vous ne pouvez pas créer deux session avec les meme information")
             }else{
-                    const createGc= await this.groupCntainerService.createGroupContainerLycee(request.prof,CreateGcDto)
+            const createGc= await this.groupCntainerService.createGroupContainerLycee(request.prof.id,CreateGcDto)
+            await this.producerService.produce({
+                topic:'croupContainer_created',
+                messages:[
+                    {
+                        value:JSON.stringify({
+                            createGc
+                            
+                        })
+                    }
+                ]
+            })
             return res.status(HttpStatus.CREATED).json(createGc)
         }
 
@@ -58,10 +92,20 @@ export class SessionController {
        
     //validate group container
     @Post("/validateGroupContainer/:idGC")
-    @UseGuards(AuthGuard,AdminGuard)
+    /*@UseGuards(AuthGuard,AdminGuard)*/
     async validateGroupContainer(@Param('idGC') idGC:string,@Res() res:Response){
         try{
             const validateGC=await this.groupCntainerService.validateGroupContainer(idGC)
+            await this.producerService.produce({
+                topic:'validate_group',
+                messages:[
+                    {
+                        value:JSON.stringify({
+                            validateGC                            
+                        })
+                    }
+                ]
+            })
             return res.status(HttpStatus.OK).json(validateGC)
         }catch(err){
             console.log(err)

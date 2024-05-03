@@ -3,24 +3,24 @@ import { Kafka, Producer, ProducerRecord } from 'kafkajs';
 
 @Injectable()
 export class ProducerService implements OnModuleInit, OnApplicationShutdown{
-   /* private readonly kafka = new Kafka({
+    private readonly kafka = new Kafka({
         brokers: ['localhost:9092'],
-      });*/
+      });
     
-      //private readonly producer: Producer = this.kafka.producer();
+      private readonly producer: Producer = this.kafka.producer();
     
       async onModuleInit() {
         // Connect Producer on Module initialization
-        /*await this.producer.connect();*/
+        await this.producer.connect();
       }
     
       async produce(record: ProducerRecord) {
         //Send Records to Kafka to producer
-       // this.producer.send(record);
+       this.producer.send(record);
       }
     
       async onApplicationShutdown() {
         //Disconnect producer on Application ShutDown
-        //await this.producer.disconnect();
+        await this.producer.disconnect();
       }
 }

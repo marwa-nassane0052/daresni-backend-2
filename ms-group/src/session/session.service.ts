@@ -6,6 +6,7 @@ import { CreateGcDto } from 'src/Dto/createGD.dto';
 import { Group } from 'src/Entity/group.schema';
 import { GroupContainer } from 'src/Entity/groupContainer';
 import { Level } from 'src/enum/level';
+import { ProducerService } from 'src/kafka/producer/producer.service';
 
 @Injectable()
 export class SessionService {
@@ -30,6 +31,7 @@ export class SessionService {
             sessionDuration:CreateGcDto.sessionDuration,
             valide:false
         })
+        
 
         return await newGroupContainer.save()
     }
@@ -75,6 +77,7 @@ export class SessionService {
                 valide:true
             },{new:true})
             return groupContainer
+
         }catch(err){
             console.log(err)
         }
