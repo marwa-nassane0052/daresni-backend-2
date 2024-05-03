@@ -32,7 +32,7 @@ import { EurekaModule } from 'nestjs-eureka';
     
     AuthModule,
     UserModule,
-    MongooseModule.forRoot('mongodb+srv://mnassane:123456789Marwa@cluster0.9hn0nt1.mongodb.net/ms-auth?retryWrites=true&w=majority&appName=Cluster0'),
+    MongooseModule.forRoot("mongodb://localhost:27017/ms-auth"),
    
   ],
   controllers: [AppController],
