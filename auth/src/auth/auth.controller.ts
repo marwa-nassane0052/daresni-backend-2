@@ -81,4 +81,20 @@ export class AuthController {
     return this.authService.verifyUser(token);
   }
   
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('picture')) 
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    try {
+      if (!file) {
+        throw new Error('No file uploaded');
+      }
+      const result = await this.authService.uploadToCloudinary(file.buffer);
+      return result;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw new Error('Failed to upload image');
+    }
+  }
+
 }
