@@ -36,15 +36,7 @@ export class SessionController {
                         messages:[
                             {
                                 value:JSON.stringify({
-                                    moduleName:createGc.moduleName,
-                                    profId:createGc.profId,
-                                    level:createGc.level,
-                                    year:createGc.year,  
-                                    studentNumber:createGc.studentNumber,
-                                    price:createGc.price,
-                                    sessionsNumberPerWeek:createGc.sessionsNumberPerWeek,
-                                    studyDuration:createGc.studyDuration,
-                                    sessionDuration:createGc.sessionDuration,
+                                    createGc
                                     
                                 })
                             }

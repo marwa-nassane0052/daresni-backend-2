@@ -22,7 +22,7 @@ export class UserController {
       await this.userService.deleteUser(userId);
     }
     // get all profs
-    @UseGuards(AdminGuard)
+    //@UseGuards(AdminGuard)
     @Get('profs')
     async getProfs(): Promise<Prof[]> {
       return this.userService.getProfs();

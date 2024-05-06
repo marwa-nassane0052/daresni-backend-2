@@ -20,8 +20,8 @@ export class GroupContainerService implements OnModuleInit {
 
                 const messageString = message.value.toString();
                 const eventData = JSON.parse(messageString);
-                
                 const prof=await this.profModel.findOne({id_prof:eventData.createGc.profId})
+                console.log(prof)
                 const newGroupConatiner=new this.groupContainerModel({
                     moduleName:eventData.createGc.moduleName,
                     level:eventData.createGc.level,

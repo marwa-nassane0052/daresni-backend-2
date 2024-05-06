@@ -17,7 +17,19 @@ import { KafkaModule } from './kafka/kafka.module';
         isGlobal: true
       }
     ),
-   
+    EurekaModule.forRoot({
+      eureka: {
+        host: 'localhost',
+        port: 8888,
+        registryFetchInterval: 1000,
+        servicePath: '/eureka/apps/',
+        maxRetries: 3,
+      },
+      service: {
+        name: 'auth-service',
+        port: 3000,
+      },
+    }),
     
     AuthModule,
     UserModule,
@@ -31,19 +43,7 @@ import { KafkaModule } from './kafka/kafka.module';
 export class AppModule {}
 /*
 
- EurekaModule.forRoot({
-      eureka: {
-        host: 'localhost',
-        port: 8888,
-        registryFetchInterval: 1000,
-        servicePath: '/eureka/apps/',
-        maxRetries: 3,
-      },
-      service: {
-        name: 'auth-service',
-        port: 3000,
-      },
-    }),
+ 
 MongooseModule.forRoot('mongodb://127.0.0.1/auth'),
 
 

@@ -7,6 +7,19 @@ spring:
 
   cloud:
     gateway:
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins:
+              - "http://localhost:3001"
+            allowedMethods:
+              - GET
+              - POST
+              - DELETE
+              - PUT
+            allowedHeaders: "*"
+
+
       routes:
         - id: route1
           predicates:
@@ -28,6 +41,8 @@ spring:
           filters:
             - RewritePath=/arabeLanguage/(?<s>.*), /${s}
           uri: lb://ms-ArabeLanguage
+
+
 
 eureka:
   client:
