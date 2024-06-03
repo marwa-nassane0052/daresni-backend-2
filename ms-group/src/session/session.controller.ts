@@ -18,6 +18,14 @@ export class SessionController {
     async getAllGroupContainers(){
         return await this.groupCntainerService.getAllGroupContainers()
     }
+
+    @Get('/groupContainer/:idGC')
+    async getAllGroupContainerById(@Param("idGC") idGC:string){
+        return await this.groupCntainerService.getGroupCOntainerById(idGC)
+    }
+
+
+    
      
     //cretae a session for cem student
     @Post('/createGroupContainerCem')

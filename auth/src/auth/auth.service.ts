@@ -52,7 +52,7 @@ export class AuthService {
   }
 
   //prof signup
-  async signupProf(createUserDto: UserDTO, userData): Promise<any> {
+  async signupProf(createUserDto: UserDTO, userData:ProfDTO): Promise<any> {
     const existingUser = await this.userModel.findOne({
       email: createUserDto.email,
     });
@@ -60,11 +60,11 @@ export class AuthService {
       throw new ConflictException('User already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+   const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const user = new this.userModel({
       email: createUserDto.email,
-      password: hashedPassword,
+      password: hashedPassword  ,
       role: 'prof',
     });
     await user.save();
@@ -196,6 +196,23 @@ export class AuthService {
     } catch (error) {
       console.error('Error uploading image:', error);
       throw new Error('Failed to upload image');
+    }
+  }
+
+  async  GetUserById(id:string){
+    try{
+      return this.userModel.findById(id)
+    }catch(err){
+      console.log(err)
+    }
+  }
+
+  async getProfInfoByIdUser(id:string){
+    try{
+      const prof=await this.profModel.findOne()
+      return prof
+    }catch(err){
+      console.log(err)
     }
   }
 }

@@ -28,10 +28,8 @@ export class StudentDTO {
   year: number;
 
   @IsString()
-  @IsNotEmpty()
   major: string;
   
   @IsString()
-  @IsNotEmpty()
   languageLevel: string;
 }

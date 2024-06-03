@@ -18,7 +18,7 @@ export class UserService implements OnModuleInit {
         eachMessage: async ({ topic, partition, message }) => {
             const messageString = message.value.toString();
             const eventData = JSON.parse(messageString);
-           
+            console.log(eventData)
             const newProf=new this.profModel({
                 id_prof:eventData.id_prof,
                 name:eventData.name,

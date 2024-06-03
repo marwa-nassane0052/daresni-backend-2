@@ -19,7 +19,7 @@ import { KafkaModule } from './kafka/kafka.module';
       }
     ),
     MongooseModule.forRoot(process.env.MONGODB_URL),
-    
+ 
     SessionModule,
    
     DocumentModule,

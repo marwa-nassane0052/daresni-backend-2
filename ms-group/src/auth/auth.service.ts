@@ -4,7 +4,7 @@ import axios from 'axios';
 @Injectable()
 export class AuthService {
     async checkAuth(token:string):Promise<any>{
-        const data=await axios.post("http://localhost:3000/auth/verify",{},{
+        const data=await axios.post("http://localhost:3001/auth/verify",{},{
             headers: {
                 Authorization: token,
               }
@@ -14,7 +14,7 @@ export class AuthService {
         
     }
     async getAdmin(token:string){
-        const data=await axios.get("http://localhost:3000/auth/user/admin",{
+        const data=await axios.get("http://localhost:3001/auth/user/admin",{
             headers: {
                 Authorization: token,
               }
@@ -24,7 +24,7 @@ export class AuthService {
     }
 
     async getProf(token:string){
-        const data=await axios.get("http://localhost:3000/auth/user/prof",{
+        const data=await axios.get("http://localhost:3001/auth/user/prof",{
             headers: {
                 Authorization: token,
               }
@@ -33,7 +33,7 @@ export class AuthService {
     }
 
     async getStudent(token:string){
-        const data=await axios.get("http://localhost:3000/auth/user/student",{
+        const data=await axios.get("http://localhost:3001/auth/user/student",{
             headers: {
                 Authorization: token,
               }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Param } from '@nestjs/common';
 import { GroupContainerService } from './group-container.service';
 import { fillterDto } from 'src/dto/fillter.dto';
 
@@ -13,6 +13,26 @@ export class GroupContainerController {
             console.log(err)
         }
     }
+
+    @Get('getGroupcontainer')
+    async getGroupConatinerWithProfDetail(){
+        try{
+            return await this.groupContainerService.getGroupContainer()
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+    @Get('getGroupcontainerwithId/:idGc')
+    async getGroupConatinerWithProfDetailById(@Param('idGc') idGC:string){
+        try{
+            return await this.groupContainerService.getGroupContainerById(idGC)
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+
 }
 
 

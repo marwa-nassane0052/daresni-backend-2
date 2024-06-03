@@ -11,7 +11,7 @@ spring:
         cors-configurations:
           "[/**]":
             allowedOrigins:
-              - "http://localhost:3001"
+              - "http://localhost:3000"
             allowedMethods:
               - GET
               - POST
@@ -32,7 +32,7 @@ spring:
           predicates:
             - Path=/auth-service/**
           filters:
-            - RewritePath=/auth-service/(?<s>.*), /${s}
+              - RewritePath=/auth-service/(?<s>.*), /${s}
           uri: lb://auth-service
 
         - id: route3
@@ -41,6 +41,14 @@ spring:
           filters:
             - RewritePath=/arabeLanguage/(?<s>.*), /${s}
           uri: lb://ms-ArabeLanguage
+
+        - id: route4
+          predicates:
+            - Path=/ms-projection/**
+          filters:
+            - RewritePath=/ms-projection/(?<s>.*), /${s}
+          uri: lb://ms-projection
+
 
 
 

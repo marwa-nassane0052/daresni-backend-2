@@ -2,7 +2,7 @@ import { Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { Kafka, Consumer, ConsumerRunConfig, ConsumerSubscribeTopics } from 'kafkajs';
 
 @Injectable()
-export class ConsumerService implements OnApplicationShutdown {
+export class ConsumerService implements  OnApplicationShutdown {
     private readonly Kafka = new Kafka({
         brokers: ['localhost:9092']
     });
@@ -25,7 +25,7 @@ export class ConsumerService implements OnApplicationShutdown {
         this.consumers.set(groupId, consumer);
     }
       
-    async onApplicationShutdown() {
+   async onApplicationShutdown() {
         // Disconnect all consumers on application shutdown
         for (const consumer of this.consumers.values()) {
             await consumer.disconnect();

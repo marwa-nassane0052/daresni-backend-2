@@ -5,6 +5,8 @@ import {
   Get,
   Post,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { UserDTO } from './DTO/User.dto';
@@ -13,6 +15,8 @@ import { LoginDTO } from './DTO/login.dto';
 import { ProfDTO } from './DTO/Prof.dto';
 import { StudentDTO } from './DTO/Student.dto';
 import { ProducerService } from 'src/kafka/producer/producer.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { use } from 'passport';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +27,7 @@ export class AuthController {
     @Body() createUserDto: UserDTO,
     @Body() profileDto: ProfDTO,
   ) {
+    console.log(createUserDto,profileDto)
     const createdProf=await this.authService.signupProf(createUserDto, profileDto);
     await this.producerService.produce({
       topic:'user_created',
@@ -97,4 +102,18 @@ export class AuthController {
     }
   }
 
+  @Get('userRole')
+  async getUsreRole(@Req() request: Request) {
+    const token = request.headers.authorization;
+    const decoded = this.authService.decodeToken(token);
+    const user=await this.authService.GetUserById(decoded.id)
+    return user.role
+  }
+
+  @Get('profInfo/:id')
+  async getProfInfoByIdProf(id:string) {
+    
+    const user=await this.authService.getProfInfoByIdUser(id)
+    return user
+  }
 }

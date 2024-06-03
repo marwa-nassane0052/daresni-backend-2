@@ -7,7 +7,7 @@ export class ProducerService {
     brokers: ['localhost:9092'],
   });
 
-  private readonly producer: Producer = this.kafka.producer();
+ private readonly producer: Producer = this.kafka.producer();
 
   async onModuleInit() {
     // Connect Producer on Module initialization

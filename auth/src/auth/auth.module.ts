@@ -6,20 +6,14 @@ import { User, UserSchema } from 'src/schemas/User.schema';
 import { Prof, ProfSchema } from 'src/schemas/Prof.schema';
 import { Student, StudentSchema } from 'src/schemas/Student.schema';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
 import { KafkaModule } from 'src/kafka/kafka.module';
 
 @Module({
   controllers: [AuthController],
-  imports:[KafkaModule,ConfigModule.forRoot(
-    {
-      envFilePath: '.env',
-      isGlobal: true
-    }
-  ),
+  imports:[KafkaModule,
   JwtModule.register({
     global: true,
-    secret: process.env.JWT_SECRET,
+    secret: 'Very$secret',
     signOptions: { expiresIn: '24h' },
   }),MongooseModule.forFeature([{
     name:User.name,schema:UserSchema},{

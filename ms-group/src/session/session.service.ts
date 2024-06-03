@@ -13,8 +13,14 @@ export class SessionService {
     constructor(@InjectModel(GroupContainer.name) private groupContainer:Model<GroupContainer>,
     @InjectModel(Group.name) private groupModel:Model<Group> 
     ){}
+
+
     async getAllGroupContainers():Promise<GroupContainer[]>{
-        return  await this.groupContainer.find()
+        return  await this.groupContainer.find({valide:true})
+    }
+
+    async getGroupCOntainerById(idGC:string){
+        return await this.groupContainer.findById(idGC)
     }
 
     async createGroupContainerCem(profId:string,CreateGcDto:CreateGcDto):Promise<GroupContainer>{

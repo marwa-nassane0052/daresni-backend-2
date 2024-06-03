@@ -20,6 +20,7 @@ export class GroupContainerService implements OnModuleInit {
 
                 const messageString = message.value.toString();
                 const eventData = JSON.parse(messageString);
+                console.log(eventData)
                 const prof=await this.profModel.findOne({id_prof:eventData.createGc.profId})
                 console.log(prof)
                 const newGroupConatiner=new this.groupContainerModel({
@@ -37,6 +38,7 @@ export class GroupContainerService implements OnModuleInit {
                 })
                 await newGroupConatiner.save()
                 prof.groupContainers.push(eventData.createGc._id)
+                console.log(newGroupConatiner)
                 await prof.save()
               
             },
@@ -93,5 +95,88 @@ export class GroupContainerService implements OnModuleInit {
         } catch (err) {
             console.log(err)
         }
+    }
+
+
+
+    //get croup container with session details
+    async getGroupContainer(){
+      try{
+        const resulte=await this.profModel.aggregate([
+          {
+            $lookup:{
+              from: "groupcontainers", 
+              localField: "groupContainers", 
+              foreignField: "croupContainerId",
+              as: "sessionInfo" 
+            }
+          },
+          {
+            $unwind: '$sessionInfo' 
+          },
+          { 
+            $project:{
+              name:1,
+              familyname:1,
+              email:1,
+              "sessionInfo.croupContainerId":1,
+              "sessionInfo.moduleName":1,
+              "sessionInfo.level":1,
+              "sessionInfo.speciality":1,
+              "sessionInfo.price":1,
+              "sessionInfo.valide":1,
+
+            }
+          }
+        ])
+        return resulte
+      }catch(err){
+        console.log(err)
+      }
+    }
+
+
+    async getGroupContainerById(idGc:string){
+      try{
+        const resulte=await this.profModel.aggregate([
+          {
+            $lookup:{
+              from: "groupcontainers", 
+              localField: "groupContainers", 
+              foreignField: "croupContainerId",
+              as: "sessionInfo" 
+            }
+          },
+          {
+            $unwind: '$sessionInfo' 
+          },
+          {
+            $match:{
+              "sessionInfo.croupContainerId":idGc
+            }
+          },
+          { 
+            $project:{
+              name:1,
+              familyname:1,
+              email:1,
+              "sessionInfo.croupContainerId":1,
+              "sessionInfo.moduleName":1,
+              "sessionInfo.level":1,
+              "sessionInfo.year":1,
+              "sessionInfo.speciality":1,
+              "sessionInfo.price":1,
+              "sessionInfo.valide":1,
+              "sessionInfo.studentNumber":1,
+              "sessionInfo.sessionDuration":1,
+              "sessionInfo.studyDuration":1,
+              "sessionInfo.sessionsNumberPerWeek":1
+            }
+          }
+        ])
+        return resulte
+      }catch(err){
+        console.log(err)
+      }
     }
   }    
