@@ -10,10 +10,10 @@ import { EurekaModule } from 'nestjs-eureka';
 
 @Injectable()
 export class GroupService {
-    constructor(@InjectModel(Group.name) private groupModel:Model<Group>,
-                @InjectModel(GroupContainer.name) private groupContainer:Model<GroupContainer>
+        constructor(@InjectModel(Group.name) private groupModel:Model<Group>,
+                    @InjectModel(GroupContainer.name) private groupContainer:Model<GroupContainer>
 
-       ){}
+        ){}
 
     async getGroups():Promise<Group[]>{
         const groups=this.groupModel.find()

@@ -21,18 +21,7 @@ import { KafkaModule } from './kafka/kafka.module';
     MongooseModule.forRoot(process.env.MONGODB_URL),
     
     SessionModule,
-    EurekaModule.forRoot({
-      eureka:{
-        host: 'localhost',
-        port: 8888,
-        registryFetchInterval: 1000,
-        maxRetries: 3,
-      },
-      service:{
-        name:"ms-group",
-        port:3001
-      }
-    }),
+   
     DocumentModule,
     AuthModule,
     KafkaModule, 

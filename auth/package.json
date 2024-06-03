@@ -35,6 +35,7 @@
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "eureka-js-client": "^4.5.0",
+    "kafkajs": "^2.2.4",
     "mongoose": "^8.2.1",
     "nestjs-eureka": "^2.0.0",
     "nodemailer": "^6.9.12",

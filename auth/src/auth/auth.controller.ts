@@ -12,17 +12,33 @@ import { AuthService } from './auth.service';
 import { LoginDTO } from './DTO/login.dto';
 import { ProfDTO } from './DTO/Prof.dto';
 import { StudentDTO } from './DTO/Student.dto';
+import { ProducerService } from 'src/kafka/producer/producer.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService,private readonly producerService:ProducerService) {}
 //signUp prof
   @Post('signup/prof')
   async signupProf(
     @Body() createUserDto: UserDTO,
     @Body() profileDto: ProfDTO,
   ) {
-    return await this.authService.signupProf(createUserDto, profileDto);
+    const createdProf=await this.authService.signupProf(createUserDto, profileDto);
+    await this.producerService.produce({
+      topic:'user_created',
+      messages:[
+        {
+            value:JSON.stringify({
+              id_prof:createdProf.prof.user,
+              name:createdProf.prof.name,
+              familyname:createdProf.prof.familyname,
+              email:createdProf.prof.email,
+              phone: createdProf.prof.phone               
+            })
+        }
+    ]
+    })
+    return createdProf
   }
 //signup Student
   @Post('signup/student')
@@ -65,4 +81,20 @@ export class AuthController {
     return this.authService.verifyUser(token);
   }
   
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('picture')) 
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    try {
+      if (!file) {
+        throw new Error('No file uploaded');
+      }
+      const result = await this.authService.uploadToCloudinary(file.buffer);
+      return result;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw new Error('Failed to upload image');
+    }
+  }
+
 }
