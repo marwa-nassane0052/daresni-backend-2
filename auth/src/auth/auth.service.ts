@@ -19,7 +19,15 @@ import {
   SendSmtpEmail,
   TransactionalEmailsApiApiKeys,
 } from '@sendinblue/client';
+<<<<<<< HEAD
 import { UserModule } from 'src/user/user.module';
+=======
+import {
+  v2 as cloudinary,
+  UploadApiErrorResponse,
+  UploadApiResponse,
+} from 'cloudinary';
+>>>>>>> 3a1d9fc8aca119dec67345b78c7c0b79d4f41ea5
 
 @Injectable()
 export class AuthService {
@@ -38,10 +46,17 @@ export class AuthService {
       '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',
     );
     this.sendinblue = apiInstance;
+
+    cloudinary.config({
+      cloud_name: 'dyn2inrwa',
+      api_key: '441946785589818',
+      api_secret: 'jJqdGSfVTbicvJ3dvTyD2tk7RLE',
+      
+    });
   }
 
   //prof signup
-  async signupProf(createUserDto: UserDTO, userData: ProfDTO): Promise<any> {
+  async signupProf(createUserDto: UserDTO, userData): Promise<any> {
     const existingUser = await this.userModel.findOne({
       email: createUserDto.email,
     });
@@ -66,7 +81,6 @@ export class AuthService {
 
     try {
       await this.sendActivationEmail(createUserDto.email, tokenUrl);
-   
     } catch (error) {
       console.error('Error sending activation email:', error);
     }
@@ -101,11 +115,10 @@ export class AuthService {
 
     try {
       await this.sendActivationEmail(createUserDto.email, tokenUrl);
-  
     } catch (error) {
       console.error('Error sending activation email:', error);
     }
-    return { student};
+    return { student };
   }
 
   //user login
@@ -127,12 +140,12 @@ export class AuthService {
   decodeToken(token: string) {
     return this.jwtService.decode(token);
   }
-// very user role
+  // very user role
   async verifyUserRole(id: string, role: string): Promise<boolean> {
     const user = await this.userModel.findById(id);
     return user.role == role;
   }
-// send activation email 
+  // send activation email
   async sendActivationEmail(email: string, tokenUrl: string): Promise<any> {
     const templateId: number = parseInt('1');
 
@@ -151,7 +164,7 @@ export class AuthService {
     return result;
   }
 
-// verify user account after sending the email
+  // verify user account after sending the email
   async verifyUser(token: string): Promise<any> {
     const decodedToken = this.jwtService.verify(token);
     const userId = decodedToken.id;
@@ -166,6 +179,7 @@ export class AuthService {
 
     return { message: 'User verified successfully' };
   }
+<<<<<<< HEAD
   async getUserInfoById(id:string){
     try{
       const user=await this.userModel.findById(id)
@@ -182,3 +196,29 @@ export class AuthService {
     }
   }
 }
+=======
+
+  async uploadToCloudinary(
+    fileBuffer: Buffer,
+  ): Promise<UploadApiResponse | UploadApiErrorResponse> {
+    try {
+      return new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .unsigned_upload_stream('bcehqfvn',{ resource_type: 'auto' }, (error, result) => {
+            if (error) {
+              console.error('Error uploading image:', error);
+              reject({ message: error.message, name: 'Error', http_code: 400 });
+            } else {
+              console.log(result);
+              resolve(result as UploadApiResponse);
+            }
+          })
+          .end(fileBuffer);
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      throw new Error('Failed to upload image');
+    }
+  }
+}
+>>>>>>> 3a1d9fc8aca119dec67345b78c7c0b79d4f41ea5
