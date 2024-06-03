@@ -175,6 +175,24 @@ export class AuthService {
 
     return { message: 'User verified successfully' };
   }
+<<<<<<< HEAD
+  async getUserInfoById(id:string){
+    try{
+      const user=await this.userModel.findById(id)
+      if(user.role="prof"){
+        const prof=await this.profModel.findOne({user:id})
+        return prof
+      }else if(user.role="student"){
+        const student=await this.studentModel.findOne({user:id})
+        return student
+      }
+
+    }catch(err){
+      console.log(err)
+    }
+  }
+}
+=======
 
   async uploadToCloudinary(
     fileBuffer: Buffer,

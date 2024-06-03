@@ -22,11 +22,10 @@ async addPathFileInDB(idGC:string,idGroup:string,path:string){
 }
 async getDocuments(idGC:string,idGroup:string){
     const groupContainer=await this.groupContainer.findById(idGC)
-    const objectId=new mongoose.Types.ObjectId(idGroup)
-    if(groupContainer.groups.includes(objectId)){
+  
         const group=await this.groupModel.findById(idGroup)
         return group.document
-    } 
+    
     
 }
 }

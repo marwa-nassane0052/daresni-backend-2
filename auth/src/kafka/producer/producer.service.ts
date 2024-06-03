@@ -11,12 +11,12 @@ export class ProducerService {
 
   async onModuleInit() {
     // Connect Producer on Module initialization
-    await this.producer.connect();
+      await this.producer.connect();
   }
 
   async produce(record: ProducerRecord) {
     //Send Records to Kafka to producer
-    this.producer.send(record);
+     this.producer.send(record);
   }
 
   async onApplicationShutdown() {

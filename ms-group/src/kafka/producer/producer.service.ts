@@ -7,7 +7,7 @@ export class ProducerService implements OnModuleInit, OnApplicationShutdown{
         brokers: ['localhost:9092'],
       });
     
-      private readonly producer: Producer = this.kafka.producer();
+    private readonly producer: Producer = this.kafka.producer();
     
       async onModuleInit() {
         // Connect Producer on Module initialization
@@ -16,11 +16,11 @@ export class ProducerService implements OnModuleInit, OnApplicationShutdown{
     
       async produce(record: ProducerRecord) {
         //Send Records to Kafka to producer
-       this.producer.send(record);
+      this.producer.send(record);
       }
     
       async onApplicationShutdown() {
         //Disconnect producer on Application ShutDown
-        await this.producer.disconnect();
+       await this.producer.disconnect();
       }
 }

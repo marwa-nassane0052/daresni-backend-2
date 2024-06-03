@@ -44,13 +44,10 @@ spring:
 
         - id: route4
           predicates:
-            - Path=/ms-projection/**
+            - Path=/ms-forumMessagerie/**
           filters:
-            - RewritePath=/ms-projection/(?<s>.*), /${s}
-          uri: lb://ms-projection
-
-
-
+            - RewritePath=/ms-forumMessagerie/(?<s>.*), /${s}
+          uri: lb://ms-forumMessagerie
 
 eureka:
   client:

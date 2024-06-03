@@ -50,6 +50,7 @@ export class SessionController {
                             }
                         ]
                     })
+
                    return res.status(HttpStatus.CREATED).json(createGc)
                 }
              }catch(err){
@@ -91,8 +92,9 @@ export class SessionController {
     }
        
     //validate group container
+    //add axios in this part
     @Post("/validateGroupContainer/:idGC")
-    /*@UseGuards(AuthGuard,AdminGuard)*/
+    @UseGuards(AuthGuard,AdminGuard)
     async validateGroupContainer(@Param('idGC') idGC:string,@Res() res:Response){
         try{
             const validateGC=await this.groupCntainerService.validateGroupContainer(idGC)
@@ -106,6 +108,10 @@ export class SessionController {
                     }
                 ]
             })
+            //envoyer axios pour forum
+            await axios.post(`http://localhost:3002/forum/createforum/${validateGC._id}`);
+            //envoyer axios pour messagerie
+            await axios.post(`http://localhost:3002/messagerie/chatgroups/${validateGC._id}`);
             return res.status(HttpStatus.OK).json(validateGC)
         }catch(err){
             console.log(err)

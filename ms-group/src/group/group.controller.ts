@@ -63,10 +63,7 @@ export class GroupController {
 
         try{
             const idStudent=request.student.id
-            const isGroupComplete=await this.groupService.getStudentNumberIngroup(requireData.idGC,requireData.idGroup)
-            if(isGroupComplete){
-               return res.status(HttpStatus.FORBIDDEN).json({msg:"ce groupe est complete tu ne peux pas ajouter d'autre etudiant"})
-            }
+            
             const resulte= await this.groupService.addStudent(idStudent,requireData.idGC,requireData.idGroup)
           
             return res.status(HttpStatus.ACCEPTED).json(resulte)

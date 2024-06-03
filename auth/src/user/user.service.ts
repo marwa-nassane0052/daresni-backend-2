@@ -131,7 +131,7 @@ export class UserService {
   }
 // activate prof 
   async activateProf(id: string): Promise<User> {
-    const user = await this.userModel.findByIdAndUpdate(id, { isActive: true });
+    const user = await this.userModel.findByIdAndUpdate(id, { isActive: true },{new:true});
     if (!user) {
       throw new NotFoundException('User not found');
     }

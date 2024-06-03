@@ -17,7 +17,6 @@ import { StudentDTO } from './DTO/Student.dto';
 import { ProducerService } from 'src/kafka/producer/producer.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { use } from 'passport';
-
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,private readonly producerService:ProducerService) {}
@@ -84,6 +83,14 @@ export class AuthController {
   async verifyUser(@Req() request: Request) {
     const token = request.headers.authorization;
     return this.authService.verifyUser(token);
+  }
+
+
+  @Get('getInfoUser')
+  async getUserInfo(@Req() request: Request) {
+    const token = request.headers.authorization;
+    const decoded = this.authService.decodeToken(token);
+    return await this.authService.getUserInfoById(decoded.id)
   }
   
 
