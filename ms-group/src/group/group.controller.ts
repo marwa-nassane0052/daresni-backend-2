@@ -41,6 +41,17 @@ export class GroupController {
             return res.status(HttpStatus.CONFLICT).json(`tu ne pêut pas créer deux groupe en même temps ${matchingValue}`)
         }
         const createdGroup= await this.groupService.createGroup(idGC,creategroupDto)
+        await this.producerService.produce({
+            topic:'group_cretaed',
+                messages:[
+                    {
+                        value:JSON.stringify({
+                            createdGroup
+                            
+                        })
+                    }
+                ]
+        })
         return res.status(HttpStatus.CREATED).json(createdGroup)
 
     }
@@ -52,10 +63,7 @@ export class GroupController {
 
         try{
             const idStudent=request.student.id
-            const isGroupComplete=await this.groupService.getStudentNumberIngroup(requireData.idGC,requireData.idGroup)
-            if(isGroupComplete){
-               return res.status(HttpStatus.FORBIDDEN).json({msg:"ce groupe est complete tu ne peux pas ajouter d'autre etudiant"})
-            }
+            
             const resulte= await this.groupService.addStudent(idStudent,requireData.idGC,requireData.idGroup)
           
             return res.status(HttpStatus.ACCEPTED).json(resulte)
@@ -163,7 +171,7 @@ async test2(@Param("name") name:string,@Param("age") age:Number){
             {
                 value:JSON.stringify({
                     groupName:name,
-                    age:age
+                    studentNumber:age
                    
                 })
             }
@@ -172,14 +180,16 @@ async test2(@Param("name") name:string,@Param("age") age:Number){
     return  name
 }
 
-@Get('/text3/:name')
-async test3(@Param("name") name:string){
+@Get('/text3/:name/:email')
+async test3(@Param("name") name:string,@Param("email") email:string){
     await this.producerService.produce({
-        topic:'user_creted',
+        topic:'user_cretaed',
         messages:[
             {
                 value:JSON.stringify({
-                    user:name                   
+                    user:name,
+                    email:email
+
                 })
             }
         ]

@@ -54,6 +54,7 @@ export class UserController {
   async updateUser(@Param('id') userId: string, @Body() updateUserDto: UpdateUserDto): Promise<User> {
     return this.userService.updateUser(userId, updateUserDto);
   }
+  
   //Activate prof account by admin
   @UseGuards(AdminGuard)
   @Patch(':id/activate')

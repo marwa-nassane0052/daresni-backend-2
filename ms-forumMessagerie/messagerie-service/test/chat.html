@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Test</title>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Chat Test</h1>
+    <label for="token">Token:</label>
+    <input type="text" id="token" placeholder="Enter your token" size="100">
+    <br><br>
+    <label for="message">Message:</label>
+    <input type="text" id="message" placeholder="Enter your message">
+    <button id="sendButton">Send Message</button>
+
+    <h2>Messages</h2>
+    <div id="messages"></div>
+
+    <script>
+        const socket = io('http://localhost:3002'); // Replace with your server URL and port if different
+        const chatGroupId = '664b23273af62fdc39f1fc31'; // Your chat group ID
+
+        document.getElementById('sendButton').addEventListener('click', () => {
+            const token = document.getElementById('token').value;
+            const message = document.getElementById('message').value;
+
+            // Emit the sendMessage event
+            socket.emit('sendMessage', {
+                chatGroupId: chatGroupId,
+                contenu: message,
+                token: token
+            });
+        });
+
+        // Listen for new messages
+        socket.on('newMessage', (message) => {
+            const messagesDiv = document.getElementById('messages');
+            const messageElement = document.createElement('div');
+            messageElement.textContent = `User: ${message.nomuser} - Message: ${message.contenu}`;
+            messagesDiv.appendChild(messageElement);
+        });
+
+        // Listen for error messages
+        socket.on('errorMessage', (error) => {
+            console.error('Error message received:', error);
+        });
+
+        // Join the chat group on connection
+        socket.on('connect', () => {
+            socket.emit('joinRoom', { chatGroupId: chatGroupId });
+        });
+    </script>
+</body>
+</html>

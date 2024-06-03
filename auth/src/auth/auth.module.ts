@@ -7,11 +7,11 @@ import { Prof, ProfSchema } from 'src/schemas/Prof.schema';
 import { Student, StudentSchema } from 'src/schemas/Student.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
-
+import { KafkaModule } from 'src/kafka/kafka.module';
 
 @Module({
   controllers: [AuthController],
-  imports:[ConfigModule.forRoot(
+  imports:[KafkaModule,ConfigModule.forRoot(
     {
       envFilePath: '.env',
       isGlobal: true
@@ -26,7 +26,7 @@ import { ConfigModule } from '@nestjs/config';
     name:Prof.name,schema:ProfSchema},{
     name:Student.name,schema:StudentSchema
   }])],
- 
+  
 
   providers: [AuthService]
 })

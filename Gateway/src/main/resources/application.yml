@@ -29,6 +29,13 @@ spring:
             - RewritePath=/arabeLanguage/(?<s>.*), /${s}
           uri: lb://ms-ArabeLanguage
 
+        - id: route4
+          predicates:
+            - Path=/ms-forumMessagerie/**
+          filters:
+            - RewritePath=/ms-forumMessagerie/(?<s>.*), /${s}
+          uri: lb://ms-forumMessagerie
+
 eureka:
   client:
     register-with-eureka: true

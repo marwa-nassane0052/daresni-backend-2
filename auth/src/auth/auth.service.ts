@@ -19,6 +19,7 @@ import {
   SendSmtpEmail,
   TransactionalEmailsApiApiKeys,
 } from '@sendinblue/client';
+import { UserModule } from 'src/user/user.module';
 
 @Injectable()
 export class AuthService {
@@ -164,5 +165,20 @@ export class AuthService {
     await user.save();
 
     return { message: 'User verified successfully' };
+  }
+  async getUserInfoById(id:string){
+    try{
+      const user=await this.userModel.findById(id)
+      if(user.role="prof"){
+        const prof=await this.profModel.findOne({user:id})
+        return prof
+      }else if(user.role="student"){
+        const student=await this.studentModel.findOne({user:id})
+        return student
+      }
+
+    }catch(err){
+      console.log(err)
+    }
   }
 }

@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { MongooseModule } from '@nestjs/mongoose';
 import { EurekaModule } from 'nestjs-eureka';
+import { KafkaModule } from './kafka/kafka.module';
 
 @Module({
   imports: [
@@ -29,11 +30,11 @@ import { EurekaModule } from 'nestjs-eureka';
         port: 3000,
       },
     }),
+   
     
     AuthModule,
     UserModule,
-    MongooseModule.forRoot("mongodb://localhost:27017/ms-auth"),
-   
+    MongooseModule.forRoot(process.env.MONGODB_URL)
   ],
   controllers: [AppController],
   providers: [AppService],
