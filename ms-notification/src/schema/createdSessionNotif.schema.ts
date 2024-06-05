@@ -26,6 +26,10 @@ export class SessionCreatedNotification {
     @Prop()
     speciality:string
 
+    @Prop()
+    id_prof:string
+
+
 }
 
-export const CatSchema = SchemaFactory.createForClass(SessionCreatedNotification);
+export const sessionNotificationSchema = SchemaFactory.createForClass(SessionCreatedNotification);

@@ -69,6 +69,7 @@ async function createPost(req, res) {
       const newPost = new Post({
         title: postData.title,
         content: content,
+        text:postData.text,
         author_full_name: `${authorData.name} ${authorData.familyname}`, 
         author_email: authorData.email,
         forumId: forumId
@@ -94,8 +95,17 @@ async function createPost(req, res) {
 async function getAllPosts(req, res) {
   try {
     const forumId = req.params.forumId;
+    const baseUrl = req.protocol + '://' + req.get('host') + '/uploads/'; // Adjust the base URL according to your setup
+
     const posts = await Post.find({ forumId });
-    res.status(200).json(posts);
+    const updatedPosts = posts.map(post => {
+      if (post.content) {
+        post.content = baseUrl + post.content;
+      }
+      return post;
+    });
+
+    res.status(200).json(updatedPosts);
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ error: "Unable to fetch posts" });

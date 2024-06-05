@@ -17,20 +17,7 @@ import { KafkaModule } from './kafka/kafka.module';
         isGlobal: true
       }
     ),
-    EurekaModule.forRoot({
-      eureka: {
-        host: 'localhost',
-        port: 8888,
-        registryFetchInterval: 1000,
-        servicePath: '/eureka/apps/',
-        maxRetries: 3,
-      },
-      service: {
-        name: 'auth-service',
-        port: 3000,
-      },
-    }),
-   
+    KafkaModule,
     AuthModule,
     UserModule,
     MongooseModule.forRoot(process.env.MONGODB_URL)

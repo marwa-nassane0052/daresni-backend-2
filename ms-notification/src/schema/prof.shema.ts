@@ -16,4 +16,4 @@ export class Prof {
 
 }
 
-export const CatSchema = SchemaFactory.createForClass(Prof);
+export const profSchema = SchemaFactory.createForClass(Prof);

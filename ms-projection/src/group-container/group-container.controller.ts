@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { GroupContainerService } from './group-container.service';
 import { fillterDto } from 'src/dto/fillter.dto';
 
 @Controller('group-container')
 export class GroupContainerController {
     constructor(private groupContainerService:GroupContainerService){}
-    @Get('getgc')
+    @Post('getgc')
     async getGroupContainer(@Body() fillterDto:fillterDto){
         try{
             return this.groupContainerService.fillter(fillterDto)

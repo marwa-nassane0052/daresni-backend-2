@@ -8,6 +8,7 @@ const Message = require('./messagerie-service/models/Message');
 const messageController = require('./messagerie-service/controllers/messageController');
 const eurekaHelper = require('./eureka-helper');
 const { Eureka } = require('eureka-js-client');
+const path = require('path'); // Import the path module
 
 // Load environment variables from .env file
 dotenv.config();
@@ -24,7 +25,7 @@ const io = socketIo(server, {
 });
 
 // Configure MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URL || 'mongodb+srv://mnassane:123456789Marwa@cluster0.9hn0nt1.mongodb.net/projection?retryWrites=true&w=majority&appName=Cluster0';
+const MONGODB_URI = process.env.MONGODB_URL || 'mongodb+srv://mnassane:123456789Marwa@cluster0.9hn0nt1.mongodb.net/ms-forume?retryWrites=true&w=majority&appName=Cluster0';
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(error => console.error('Error connecting to MongoDB:', error));
@@ -80,6 +81,8 @@ app.use('/forum', commentRoutes);
 app.use('/forum', forumRoutes);
 app.use('/messagerie', chatGroupRoutes);
 app.use('/messagerie', messageRoutes);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -133,8 +136,8 @@ io.on('connection', (socket) => {
 
 
  // Start the server
-const PORT = process.env.PORT || 3004;
-eurekaHelper.registerWithEureka('ms-forumMessagerie', PORT);
+const PORT = process.env.PORT || 3030;
+//eurekaHelper.registerWithEureka('ms-forumMessagerie', PORT);
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

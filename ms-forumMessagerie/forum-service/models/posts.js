@@ -9,6 +9,10 @@ const postSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  text:{
+    type: String,
+    required: true
+  },
   author_full_name: {
     type: String,
     

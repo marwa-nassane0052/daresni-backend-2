@@ -175,7 +175,7 @@ export class AuthService {
 
     return { message: 'User verified successfully' };
   }
-<<<<<<< HEAD
+
   async getUserInfoById(id:string){
     try{
       const user=await this.userModel.findById(id)
@@ -191,8 +191,7 @@ export class AuthService {
       console.log(err)
     }
   }
-}
-=======
+
 
   async uploadToCloudinary(
     fileBuffer: Buffer,

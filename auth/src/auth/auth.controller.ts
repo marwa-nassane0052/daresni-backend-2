@@ -26,7 +26,6 @@ export class AuthController {
     @Body() createUserDto: UserDTO,
     @Body() profileDto: ProfDTO,
   ) {
-    console.log(createUserDto,profileDto)
     const createdProf=await this.authService.signupProf(createUserDto, profileDto);
     await this.producerService.produce({
       topic:'user_created',
@@ -42,8 +41,26 @@ export class AuthController {
         }
     ]
     })
+    await this.producerService.produce({
+      topic:'prof_created_notification',
+      messages:[
+        {
+            value:JSON.stringify({
+              id_prof:createdProf.prof.user,
+              name:createdProf.prof.name,
+              familyname:createdProf.prof.familyname,
+              email:createdProf.prof.email            
+            })
+        }
+    ]
+    })
+
+    console.log(createdProf)
     return createdProf
   }
+
+
+
 //signup Student
   @Post('signup/student')
   async signupStudent(
