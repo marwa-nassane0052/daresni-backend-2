@@ -199,6 +199,20 @@ export class SessionController {
         }
     }
 
+    @Get('/sessiongroups/:idGC')
+    async getAllTHeGroupOfSession(@Param('idGC') idGC:string ,@Res() res:Response){
+        try{
+            const groups = await this.groupCntainerService.getGroupOfSession(idGC);
+           
+             
+             return res.status(HttpStatus.OK).json(groups);
+
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+
 
 
      

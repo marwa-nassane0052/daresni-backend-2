@@ -161,4 +161,23 @@ export class SessionService {
         }
     }
 
+    async getGroupOfSession(idGC: string) {
+        try {
+            const groupContainer = await this.groupContainer.findById(idGC);
+            
+            if (!groupContainer) {
+                throw new Error(`GroupContainer with id ${idGC} not found`);
+            }
+    
+            const groupPromises = groupContainer.groups.map(e => this.groupModel.findById(e));
+            const groups = await Promise.all(groupPromises);
+            
+            return groups;
+        } catch (err) {
+            console.log(err);
+            throw new Error(`Failed to get groups of session: ${err.message}`);
+        }
+    }
+    
+
 }
