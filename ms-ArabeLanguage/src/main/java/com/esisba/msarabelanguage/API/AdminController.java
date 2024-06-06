@@ -1,32 +1,34 @@
 package com.esisba.msarabelanguage.API;
 
-import com.esisba.msarabelanguage.DTO.Level.DetailLevelAdminDTO;
-import com.esisba.msarabelanguage.DTO.Level.ListLevelsDTO;
-import com.esisba.msarabelanguage.DTO.StepDTO;
-import com.esisba.msarabelanguage.entities.Level;
-import com.esisba.msarabelanguage.entities.Linguistic;
-import com.esisba.msarabelanguage.entities.Step;
-import com.esisba.msarabelanguage.entities.Student;
+import com.esisba.msarabelanguage.DTO.Admin.DetailLevelAdminDTO;
+import com.esisba.msarabelanguage.DTO.Admin.StudentDTO;
+import com.esisba.msarabelanguage.DTO.Admin.UpdateLevelDTO;
+import com.esisba.msarabelanguage.DTO.ListLevelsDTO;
+import com.esisba.msarabelanguage.entities.Class.*;
 import com.esisba.msarabelanguage.proxies.StudentProxy;
-import com.esisba.msarabelanguage.repositories.LevelRepository;
+import com.esisba.msarabelanguage.repositories.LanguageRepository;
 import com.esisba.msarabelanguage.repositories.StudentRepository;
 import jakarta.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 
 @RestController
 @RequestMapping("admin")
 public class AdminController {
 
+
+    private static final Logger log = LoggerFactory.getLogger(AdminController.class);
     @Autowired
-    LevelRepository levelRepository;
-
-
+    LanguageRepository languageRepository;
     @Resource
     StudentProxy studentProxy;
 
@@ -37,227 +39,248 @@ public class AdminController {
 
 /************************************************** Admin **************************************************************/
 
+    //1 add new Level
+    @PostMapping("/addLevel")
+    ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO ) {
+        Language language = languageRepository.findByLanguageAndLinguistic(levelDTO.getLanguage(), levelDTO.getLinguistic());
 
-    //1-a  get List of students by levelId -> in StudentsRepository
-    //1-b  get List of students by linguistic
-    @GetMapping("/students/{linguistic}")
-    List<Student> getStudents(@PathVariable("linguistic") Linguistic linguistic) {
-        List<Student> students = new ArrayList<>();
-        List<Level> levels = levelRepository.findLevelByLinguistic(linguistic);
-        for( Level level : levels) {
-            for(String idStudent : level.getIdStudents()){
-                students.add( studentRepository.findByIdStudent(idStudent));
-            }
+        // Vérifier si un niveau avec le même nom existe déjà
+        boolean levelExists = language.getLevels().stream()
+                .anyMatch(existingLevel -> existingLevel.getName().equalsIgnoreCase(levelDTO.getName()));
+        if (levelExists) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("A level with the same name already exists");
         }
-        return students;
+
+        Level level = new Level();
+        level.setName(levelDTO.getName());
+        level.setSteps(levelDTO.getSteps());
+        level.setExamnPath(levelDTO.getExamnPath());
+
+        language.getLevels().add(level);
+        languageRepository.save(language);
+
+        return ResponseEntity.ok("Level added Successfully");
+
     }
 
-    //1-c get All students -> /students
-
-
-    //2 upgrade level of student
-    @PostMapping("/students/{idStudent}/upgradeLevel")
-    ResponseEntity<String> upgradeLevel(@PathVariable("idStudent") String idStudent) {
-        Student student = studentRepository.findByIdStudent(idStudent);
-        Long currentLevelId= student.getCurrentLevelId();
-        //remove student from current level
-        Level level = levelRepository.findLevelByIdLevel(currentLevelId);
-        List<String> idStudents =level.getIdStudents();
-        idStudents.remove(idStudent);
-        levelRepository.save(level);
-
-        // add student to next level
-        Level levelUpgrade = levelRepository.findLevelByIdLevel(currentLevelId+1L);
-        List<String> idStudentsUpgraded =levelUpgrade.getIdStudents();
-        idStudentsUpgraded.add(idStudent);
-        levelRepository.save(levelUpgrade);
-
-        //upgrade currentLevel in student entity
-        student.setCurrentLevelId(currentLevelId+1L);
-        student.setCurrentStep(1);
-        studentRepository.save(student);
-
-        return ResponseEntity.ok("Level upgraded Successfully");
-    }
-
-
-    //3 get List Of Levels  -> or with all fields in LevelRepository
+    //2 get List Of Levels (All)
     @GetMapping("/levels/all")
     List<ListLevelsDTO> getlevels() {
+
         List<ListLevelsDTO> levelDTOs = new ArrayList<>();
-        List<Level> levels = levelRepository.findAll();
-        for (Level level : levels) {
-            ListLevelsDTO levelDTO = new ListLevelsDTO();
-            levelDTO.setName(level.getName());
-            levelDTO.setId(level.getIdLevel());
-            levelDTO.setLinguistic(level.getLinguistic());
-            levelDTOs.add(levelDTO);
+        List<Language> languages = languageRepository.findAll();
+        for (Language language : languages) {
+            for (Level level : language.getLevels()) {
+                ListLevelsDTO levelDTO = new ListLevelsDTO();
+                levelDTO.setName(level.getName());
+                levelDTO.setLinguistic(language.getLinguistic());
+                levelDTO.setLanguage(language.getLanguage());
+                levelDTOs.add(levelDTO);
+            }
         }
         return levelDTOs;
     }
 
-    //3-a get List Of Levels by name -> or with all fields in LevelRepository
-    @GetMapping("/levels/levelName")
-    List<ListLevelsDTO> getlevelsByName(@RequestParam("levelName") String levelName ) {
-        List<ListLevelsDTO> levelDTOs = new ArrayList<>();
-        List<Level> levels = levelRepository.findByName(levelName);
-        for (Level level : levels) {
-            ListLevelsDTO levelDTO = new ListLevelsDTO();
+
+    //3 get Level
+    @GetMapping("{idLang}/levels/{nameLevel}")
+    public ResponseEntity<?> getLevel(@PathVariable("idLang") String idLang, @PathVariable("nameLevel") String nameLevel) {
+        try {
+            Language language = languageRepository.findByIdLang(idLang);
+
+            Optional<Level> levelOptional = language.getLevels().stream()
+                    .filter(levelexist -> levelexist.getName().equalsIgnoreCase(nameLevel))
+                    .findFirst();
+
+            if (!levelOptional.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Level not found");
+            }
+
+            Level level = levelOptional.get();
+            DetailLevelAdminDTO levelDTO = new DetailLevelAdminDTO();
             levelDTO.setName(level.getName());
-            levelDTO.setId(level.getIdLevel());
-            levelDTO.setLinguistic(level.getLinguistic());
-            levelDTOs.add(levelDTO);
-        }
-        return levelDTOs;
-    }
-    //3-b get List Of Levels by Linguistic -> LevelRepository
-    @GetMapping("/levels/linguistic")
-        List<ListLevelsDTO> getlevelsByLinguistic(@RequestParam("linguistic") Linguistic linguistic ) {
-        List<ListLevelsDTO> levelDTOs = new ArrayList<>();
-        List<Level> levels = levelRepository.findLevelByLinguistic(linguistic);
-        for (Level level : levels) {
-            ListLevelsDTO levelDTO = new ListLevelsDTO();
-            levelDTO.setName(level.getName());
-            levelDTO.setId(level.getIdLevel());
-            levelDTO.setLinguistic(level.getLinguistic());
-            levelDTOs.add(levelDTO);
-        }
-        return levelDTOs;
-    }
-    //3-c get List Of Levels by name and Linguistic -> LevelRepository
-    @GetMapping("/levels/linguisticANDname")
-    ListLevelsDTO getlevelsByNameAndLinguistic(@RequestParam("linguistic") Linguistic linguistic , @RequestParam("levelName") String levelName) {
-        ListLevelsDTO levelDTO = new ListLevelsDTO();
-        Level level = levelRepository.findByNameAndLinguistic(levelName,linguistic);
-        levelDTO.setName(level.getName());
-        levelDTO.setId(level.getIdLevel());
-        levelDTO.setLinguistic(level.getLinguistic());
-        return levelDTO;
-    }
-
-
-    //4 get Detail of Level to Admin
-    @GetMapping("/levels/{levelId}")
-    DetailLevelAdminDTO getlevels(@PathVariable("levelId") Long levelId) {
-        List<Student> students = new ArrayList<>();
-        DetailLevelAdminDTO levelDTO = new DetailLevelAdminDTO();
-        Level level = levelRepository.findLevelByIdLevel(levelId);
-        levelDTO.setName(level.getName());
-        levelDTO.setId(level.getIdLevel());
-        levelDTO.setExamn(level.getExamnPath());
-        levelDTO.setLinguistic(level.getLinguistic());
-        levelDTO.setSteps(level.getSteps());
-        return levelDTO;
-    }
-
-    //5  upload exam
-    @PostMapping("/levels/{levelId}/uploadExam")
-    ResponseEntity<String> uploadExam(@PathVariable("levelId") Long levelId , @RequestBody String examPath) {
-        Level level = levelRepository.findLevelByIdLevel(levelId);
-        level.setExamnPath(examPath);
-        levelRepository.save(level);
-        return ResponseEntity.ok("uploaded Successfully");
-    }
-
-    //6  get Step by index
-    @GetMapping("/levels/{levelId}/{stepId}")
-    Step getStep(@PathVariable("levelId") Long levelId , @PathVariable("stepId") int stepId) {
-        Level level = levelRepository.findLevelByIdLevel(levelId);
-        Step step = level.getSteps().get(stepId-1);
-        return step;
-    }
-
-
-    //7 update Step of a Level
-    @PutMapping("/levels/{levelId}/{stepIndex}/update")
-    Step updateStep(@PathVariable("levelId") Long levelId, @PathVariable("stepIndex") int stepIndex, @RequestBody StepDTO stepDTO) {
-        Level level = levelRepository.findLevelByIdLevel(levelId);
-        List<Step> steps = level.getSteps();
-
-        if (stepIndex >= 0 && stepIndex < steps.size()) {
-            Step step = steps.get(stepIndex-1);
-            // Update the fields of the Step object
-            step.setTitle(stepDTO.getTitle());
-            step.setRule(stepDTO.getRule());
-            step.setDescription(stepDTO.getDescription());
-            step.setExemples(stepDTO.getExemples());
-            step.setQuestion(stepDTO.getQuestion());
-            step.setAnswer(stepDTO.getAnswer());
-
-            // Save the updated step back to the list
-            steps.set(stepIndex-1, step);
-
-            // Update the steps list in the level object
-            level.setSteps(steps);
-
-            // Save the updated level back to the repository
-            levelRepository.save(level);
-
-            return step;
-        } else {
-            throw new IllegalArgumentException("Invalid step index");
+            levelDTO.setLinguistic(language.getLinguistic());
+            levelDTO.setLanguage(language.getLanguage());
+            levelDTO.setExamnPath(level.getExamnPath());
+            levelDTO.setSteps(level.getSteps());
+            return ResponseEntity.ok(levelDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
         }
     }
 
-    @PatchMapping("/levels/{levelId}/{stepIndex}/update")
-    Step patchStep(@PathVariable("levelId") Long levelId, @PathVariable("stepIndex") int stepIndex, @RequestBody Map<String, Object> updates) {
-        Level level = levelRepository.findLevelByIdLevel(levelId);
-        List<Step> steps = level.getSteps();
 
-        if (stepIndex >= 0 && stepIndex < steps.size()) {
-            Step step = steps.get(stepIndex);
+    //4 update (put / patch) level
 
-            // Apply updates from the request body
-            updates.forEach((key, value) -> {
-                switch (key) {
-                    case "title":
-                        step.setTitle((String) value);
-                        break;
-                    case "rule":
-                        step.setRule((String) value);
-                        break;
-                    case "description":
-                        step.setDescription((String) value);
-                        break;
-                    case "exemples":
-                        step.setExemples((List<String>) value);
-                        break;
-                    case "question":
-                        step.setQuestion((String) value);
-                        break;
-                    case "answer":
-                        step.setAnswer((String) value);
-                        break;
-                    default:
-                        // Handle unknown fields or ignore them
-                        break;
+    @PutMapping("{idLang}/levels/{nameLevel}/update")
+    public ResponseEntity<?> updateLevel(@PathVariable("nameLevel") String nameLevel, @PathVariable("idLang") String idLang, @RequestBody UpdateLevelDTO updates) {
+        try {
+            Language language = languageRepository.findByIdLang(idLang);
+            if (language == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Language not found");
+            }
+
+            Optional<Level> levelOptional = language.getLevels().stream()
+                    .filter(levelExist -> levelExist.getName().equalsIgnoreCase(nameLevel))
+                    .findFirst();
+
+            if (!levelOptional.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Level not found");
+            }
+
+            Level level = levelOptional.get();
+            // Replace the old level with the updated one in the list
+            int index = language.getLevels().indexOf(level);
+
+            level.setName(updates.getName());
+            level.setSteps(updates.getSteps());
+            level.setExamnPath(updates.getExamnPath());
+            language.getLevels().set(index, level);
+
+            // Save the updated language back to the repository
+            languageRepository.save(language);
+
+            return ResponseEntity.ok("Level updated successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid update data: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating the level: " + e.getMessage());
+        }
+    }
+
+
+    @PatchMapping("{idLang}/levels/{nameLevel}/update")
+    public ResponseEntity<?> patchLevel(@PathVariable("nameLevel") String nameLevel, @PathVariable("idLang") String idLang, @RequestBody UpdateLevelDTO updates) {
+        try {
+            Language language = languageRepository.findByIdLang(idLang);
+            if (language == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Language not found");
+            }
+
+            Optional<Level> levelOptional = language.getLevels().stream()
+                    .filter(levelExist -> levelExist.getName().equalsIgnoreCase(nameLevel))
+                    .findFirst();
+
+            if (!levelOptional.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Level not found");
+            }
+
+            Level level = levelOptional.get();
+
+            if (updates.getName() != null) {
+                level.setName(updates.getName());
+            }
+            if (updates.getSteps() != null ) {
+                level.setSteps(updates.getSteps());
+            }
+            if (updates.getExamnPath() != null ) {
+                level.setExamnPath(updates.getExamnPath());
+
+            }
+
+            // Replace the old level with the updated one in the list
+            int index = language.getLevels().indexOf(level);
+            language.getLevels().set(index, level);
+
+            // Save the updated language back to the repository
+            languageRepository.save(language);
+
+            return ResponseEntity.ok("Level updated successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid update data: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating the level: " + e.getMessage());
+        }
+    }
+     //5 liste of submissions
+
+    @GetMapping("/{idLang}/submissions")
+    ResponseEntity<List<StudentDTO>> getStudents(@PathVariable("idLang") String idLang) {
+        Language language = languageRepository.findByIdLang(idLang);
+        List<StudentInfo> studentInfos = language.getStudentInfos();
+        if (studentInfos == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+        }
+        List<StudentDTO> students = new ArrayList<>();
+        for( StudentInfo studentInfo : studentInfos) {
+            Student student = studentRepository.findByIdStudent(studentInfo.getIdStudent());
+            if (studentInfo.getExamSolutionPath() != null) {
+                StudentDTO studentDTO = new StudentDTO();
+
+                studentDTO.setIdStudent(student.getIdStudent());
+                studentDTO.setEmail(student.getEmail());
+                studentDTO.setLanguage(language.getLanguage());
+                studentDTO.setLinguistic(language.getLinguistic());
+                studentDTO.setIdLang(language.getIdLang());
+                Level level = language.getLevels().get(studentInfo.getCurrentLevel());
+                studentDTO.setLevelName(level.getName());
+                studentDTO.setExamnSolutionPath(studentInfo.getExamSolutionPath());
+                students.add(studentDTO);
+            }
+        }
+        return ResponseEntity.ok(students);
+    }
+
+
+
+    //6 upgrade student level
+    @PostMapping("{idLang}/submissions/{idStudent}/upgradeLevel")
+    public ResponseEntity<String> upgradeLevel(@PathVariable("idStudent") String idStudent, @PathVariable("idLang") String idLang) {
+        try {
+            Student student = studentRepository.findByIdStudent(idStudent);
+            if (student == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found");
+            }
+
+            Language language = languageRepository.findByIdLang(idLang);
+            if (language == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Language not found");
+            }
+
+            List<StudentInfo> studentInfos = language.getStudentInfos();
+            if (studentInfos == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student info list not found");
+            }
+
+            Optional<StudentInfo> studentInfoOp = studentInfos.stream()
+                    .filter(idStudentAndExamexist -> idStudentAndExamexist.getIdStudent().equalsIgnoreCase(idStudent))
+                    .findFirst();
+            if (!studentInfoOp.isPresent()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student not found in this language");
+            }
+
+            StudentInfo studentInfo = studentInfoOp.get();
+            int currentLevel = studentInfo.getCurrentLevel();
+
+            if ((currentLevel+1) == language.getLevels().size()) {
+                // Remove student from language
+                language.getStudentInfos().remove(studentInfo);
+                languageRepository.save(language);
+
+
+                List<String> learnedLenguages =student.getLearnedLanguage();
+                if (learnedLenguages == null){
+                    learnedLenguages = new ArrayList<>();
                 }
-            });
+                learnedLenguages.add(idLang);
+                student.setLearnedLanguage(learnedLenguages);
+                studentRepository.save(student);
 
-            // Save the updated step back to the list
-            steps.set(stepIndex, step);
+                return ResponseEntity.ok("Student finished all levels of this language and has been removed from it");
 
-            // Update the steps list in the level object
-            level.setSteps(steps);
+            } else {
+                // Upgrade current level in student entity
+                studentInfo.setCurrentLevel(currentLevel + 1);
+                studentInfo.setCurrentStep(0);
+                studentInfo.setExamSolutionPath(null);
+                int index = language.getStudentInfos().indexOf(studentInfo);
+                language.getStudentInfos().set(index, studentInfo); // Replace the old entry with the updated one
+                languageRepository.save(language);
 
-            // Save the updated level back to the repository
-            levelRepository.save(level);
-
-            return step;
-        } else {
-            throw new IllegalArgumentException("Invalid step index");
-        }
-    }
-
-    //8  download examSolution
-    @GetMapping("/levels/{levelId}/{studentId}/downlaodExamSolution")
-    String downloadedExamSolution(@PathVariable("levelId") Long levelId, @PathVariable("studentId") String studentId) {
-        Student student = studentRepository.findByIdStudent(studentId);
-        String examSolution = student.getExamnSolutionPath();
-        if(examSolution != null) {
-            return examSolution;
-        }else {
-            return "No examSolution found";
+                return ResponseEntity.ok("Level upgraded successfully");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while upgrading the level: " + e.getMessage());
         }
     }
 

@@ -1,13 +1,12 @@
-package com.esisba.msarabelanguage.entities;
+package com.esisba.msarabelanguage.entities.Class;
 
-import com.esisba.msarabelanguage.models.StudentAuth;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor @NoArgsConstructor
@@ -16,9 +15,7 @@ public class Student {
 
     @Id
     private String idStudent;
-    private String  examnSolutionPath;
     private String email;
-    private int currentStep;
-    private Long  currentLevelId;
+    private List<String> learnedLanguage ;
 
 }

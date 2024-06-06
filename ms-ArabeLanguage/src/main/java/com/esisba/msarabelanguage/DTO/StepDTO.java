@@ -7,9 +7,6 @@ import java.util.List;
 public class StepDTO {
 
     private String title;
-    private String rule;
-    private String description;
-    private List<String> exemples;
-    private String question;
-    private String answer;
+    private String content;
+
 }
