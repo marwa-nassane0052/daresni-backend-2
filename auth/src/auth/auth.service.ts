@@ -123,6 +123,10 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User doesnt exist!');
     }
+    if(user.role === "prof" && !user.isActive){
+      throw new UnauthorizedException('Invalid account');
+
+    }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
@@ -176,21 +180,24 @@ export class AuthService {
     return { message: 'User verified successfully' };
   }
 
-  async getUserInfoById(id:string){
-    try{
-      const user=await this.userModel.findById(id)
-      if(user.role="prof"){
-        const prof=await this.profModel.findOne({user:id})
-        return prof
-      }else if(user.role="student"){
-        const student=await this.studentModel.findOne({user:id})
-        return student
+  async getUserInfoById(id: string) {
+    try {
+      const user = await this.userModel.findById(id);
+  
+      if (user.role === "prof") {
+        const prof = await this.profModel.findOne({ user: id });
+        return prof;
+      } else if (user.role === "student") {
+        const student = await this.studentModel.findOne({ user: id });
+        return student;
       }
-
-    }catch(err){
-      console.log(err)
+  
+    } catch (err) {
+      console.log(err);
+      throw err; // Ensure the error is propagated up the call stack
     }
   }
+  
 
 
   async uploadToCloudinary(

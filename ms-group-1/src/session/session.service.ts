@@ -101,7 +101,7 @@ export class SessionService {
     }
     async groupContainerByProf(idProf:string){
         try{
-            const groupContainers=await this.groupContainer.find({profId:idProf,valide:true})
+            const groupContainers=await this.groupContainer.find({profId:idProf})
             return groupContainers
         }catch(err){
             console.log(err)

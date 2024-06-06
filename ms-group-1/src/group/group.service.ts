@@ -187,7 +187,16 @@ export class GroupService {
             const groups=await this.groupModel.find({
                 studentList:idStudent
             })
-            return groups
+            const groupsContainer = await Promise.all(groups.map(async (e) => {
+                const gp = await this.groupContainer.findById(e.groupContainer);
+                return {
+                    modulename:gp.moduleName,
+                    price:gp.price,
+                    group:e
+                };
+            }));
+
+            return groupsContainer
         }catch(err){
             console.log(err)
         }
