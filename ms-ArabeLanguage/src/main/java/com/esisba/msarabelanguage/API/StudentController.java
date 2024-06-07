@@ -1,5 +1,6 @@
 package com.esisba.msarabelanguage.API;
 
+import com.esisba.msarabelanguage.DTO.LanguageDTO;
 import com.esisba.msarabelanguage.DTO.StepDTO;
 import com.esisba.msarabelanguage.DTO.Student.DetailLevelStudentDTO;
 import com.esisba.msarabelanguage.entities.Class.*;
@@ -35,6 +36,22 @@ public class StudentController {
 
     /************************************************** Student **************************************************************/
 
+    //0 Get languages have levels
+    @GetMapping("/languages")
+    public List<LanguageDTO> availableLanguages (){
+        List<LanguageDTO> languages = new ArrayList<>();
+        for(Language language : languageRepository.findAll()){
+            if (language.getLevels() != null && language.getLevels().size() > 0) {
+                LanguageDTO languageDTO = new LanguageDTO();
+                languageDTO.setIdLang(language.getIdLang());
+                languageDTO.setLanguage(language.getLanguage());
+                languageDTO.setLinguistic(language.getLinguistic());
+                languages.add(languageDTO);
+            }
+        }
+
+        return languages ;
+    }
 
     //1 verify if student exist
     @GetMapping("/isStudentIAL")
@@ -48,11 +65,14 @@ public class StudentController {
     //2  inscription of student in language level (learn)
     @PostMapping("/{idLang}/inscription")
     ResponseEntity<?> ArabeInscription( @PathVariable("idLang") String idLang,@RequestHeader("Authorization") String token) {
-        Student student;
 
-        StudentAuth studentAuth = studentProxy.getEtudiant(token);
         Language language = languageRepository.findByIdLang(idLang);
+        if( language.getLevels() == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is no level in this language");
+        }
 
+        Student student;
+        StudentAuth studentAuth = studentProxy.getEtudiant(token);
         List<StudentInfo> studentInfos = language.getStudentInfos();
 
         if (studentInfos == null ) {
@@ -87,7 +107,6 @@ public class StudentController {
             studentInfos.add(new StudentInfo(studentAuth.getId(),null, 0,0));
             language.setStudentInfos(studentInfos);
             languageRepository.save(language);
-
             Level level = language.getLevels().get(0);
 
             DetailLevelStudentDTO detailLevelStudentDTO = new DetailLevelStudentDTO();
@@ -222,7 +241,7 @@ public class StudentController {
         List<StudentInfo> studentInfos = language.getStudentInfos();
 
         if (studentInfos == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student info list not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("You are not inscribed in this language ");
         }
 
         Optional<StudentInfo> studentInfoOp = studentInfos.stream()

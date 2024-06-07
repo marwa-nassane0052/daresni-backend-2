@@ -39,43 +39,56 @@ public class AdminController {
 
 /************************************************** Admin **************************************************************/
 
-    //1 add new Level
-    @PostMapping("/addLevel")
-    ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO ) {
-        Language language = languageRepository.findByLanguageAndLinguistic(levelDTO.getLanguage(), levelDTO.getLinguistic());
 
-        // Vérifier si un niveau avec le même nom existe déjà
-        boolean levelExists = language.getLevels().stream()
-                .anyMatch(existingLevel -> existingLevel.getName().equalsIgnoreCase(levelDTO.getName()));
-        if (levelExists) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("A level with the same name already exists");
-        }
+//1 add new Level
+@PostMapping("/addLevel")
+public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO) {
+    Language language = languageRepository.findByLanguageAndLinguistic(levelDTO.getLanguage(), levelDTO.getLinguistic());
 
-        Level level = new Level();
-        level.setName(levelDTO.getName());
-        level.setSteps(levelDTO.getSteps());
-        level.setExamnPath(levelDTO.getExamnPath());
-
-        language.getLevels().add(level);
-        languageRepository.save(language);
-
-        return ResponseEntity.ok("Level added Successfully");
-
+    // Check if language exists
+    if (language == null) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Language not found");
     }
+
+    if (language.getLevels() == null) {
+        language.setLevels(new ArrayList<>());
+    }
+
+    // Check if a level with the same name already exists
+    boolean levelExists = language.getLevels().stream()
+            .anyMatch(existingLevel -> existingLevel.getName().equalsIgnoreCase(levelDTO.getName()));
+    if (levelExists) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("A level with the same name already exists");
+    }
+
+    // Create and add new level
+    Level level = new Level();
+    level.setName(levelDTO.getName());
+    level.setSteps(levelDTO.getSteps());
+    level.setExamnPath(levelDTO.getExamnPath());
+
+    language.getLevels().add(level);
+    languageRepository.save(language);
+
+    return ResponseEntity.ok("Level added successfully");
+}
+
 
     //2 get List Of Levels (All)
     @GetMapping("/levels/all")
     List<ListLevelsDTO> getlevels() {
 
         List<ListLevelsDTO> levelDTOs = new ArrayList<>();
-        List<Language> languages = languageRepository.findAll();
-        for (Language language : languages) {
-            for (Level level : language.getLevels()) {
-                ListLevelsDTO levelDTO = new ListLevelsDTO();
-                levelDTO.setName(level.getName());
-                levelDTO.setLinguistic(language.getLinguistic());
-                levelDTO.setLanguage(language.getLanguage());
-                levelDTOs.add(levelDTO);
+
+        for (Language language : languageRepository.findAll()) {
+            if (language.getLevels() != null) {
+                for (Level level : language.getLevels()) {
+                    ListLevelsDTO levelDTO = new ListLevelsDTO();
+                    levelDTO.setName(level.getName());
+                    levelDTO.setLinguistic(language.getLinguistic());
+                    levelDTO.setLanguage(language.getLanguage());
+                    levelDTOs.add(levelDTO);
+                }
             }
         }
         return levelDTOs;
@@ -105,7 +118,7 @@ public class AdminController {
             levelDTO.setSteps(level.getSteps());
             return ResponseEntity.ok(levelDTO);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("There is not Level with this name"); // An error occurred: " + e.getMessage()
         }
     }
 
