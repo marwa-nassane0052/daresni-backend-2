@@ -5,16 +5,24 @@ import com.esisba.msarabelanguage.DTO.Admin.StudentDTO;
 import com.esisba.msarabelanguage.DTO.Admin.UpdateLevelDTO;
 import com.esisba.msarabelanguage.DTO.ListLevelsDTO;
 import com.esisba.msarabelanguage.entities.Class.*;
+import com.esisba.msarabelanguage.fileManagement.service.IFileSytemStorage;
 import com.esisba.msarabelanguage.proxies.StudentProxy;
 import com.esisba.msarabelanguage.repositories.LanguageRepository;
 import com.esisba.msarabelanguage.repositories.StudentRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +41,9 @@ public class AdminController {
     StudentProxy studentProxy;
 
     @Autowired
+    IFileSytemStorage fileSytemStorage;
+
+    @Autowired
     StudentRepository studentRepository;
 
 
@@ -40,22 +51,25 @@ public class AdminController {
 /************************************************** Admin **************************************************************/
 
 
-//1 add new Level
-@PostMapping("/addLevel")
-public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO) {
+@PostMapping(value = "/addLevel" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<String> addLevel(@RequestParam("level") String levelJson, @RequestParam("examFile") MultipartFile examFile) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    DetailLevelAdminDTO levelDTO;
+    try {
+        levelDTO = objectMapper.readValue(levelJson, DetailLevelAdminDTO.class);
+    } catch (IOException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid JSON format");
+    }
+
     Language language = languageRepository.findByLanguageAndLinguistic(levelDTO.getLanguage(), levelDTO.getLinguistic());
 
     // Check if language exists
     if (language == null) {
-
         language = new Language();
         language.setLanguage(levelDTO.getLanguage());
         language.setLinguistic(levelDTO.getLinguistic());
-        languageRepository.save(language);
-    }
-
-    if (language.getLevels() == null) {
         language.setLevels(new ArrayList<>());
+        languageRepository.save(language);
     }
 
     // Check if a level with the same name already exists
@@ -69,13 +83,23 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
     Level level = new Level();
     level.setName(levelDTO.getName());
     level.setSteps(levelDTO.getSteps());
-    level.setExamnPath(levelDTO.getExamnPath());
+
+    // Upload exam
+    String upfile = fileSytemStorage.saveFile(examFile);
+    String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+            .path("/student/download/")
+            .path(upfile)
+            .toUriString();
+    level.setExamFile(upfile);
 
     language.getLevels().add(level);
     languageRepository.save(language);
 
     return ResponseEntity.ok("Level added successfully");
 }
+
+
+
 
 
     //2 get List Of Levels (All)
@@ -88,6 +112,7 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
             if (language.getLevels() != null) {
                 for (Level level : language.getLevels()) {
                     ListLevelsDTO levelDTO = new ListLevelsDTO();
+                    levelDTO.setIdLang(language.getIdLang());
                     levelDTO.setName(level.getName());
                     levelDTO.setLinguistic(language.getLinguistic());
                     levelDTO.setLanguage(language.getLanguage());
@@ -118,7 +143,7 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
             levelDTO.setName(level.getName());
             levelDTO.setLinguistic(language.getLinguistic());
             levelDTO.setLanguage(language.getLanguage());
-            levelDTO.setExamnPath(level.getExamnPath());
+            levelDTO.setExamnPath(level.getExamFile());
             levelDTO.setSteps(level.getSteps());
             return ResponseEntity.ok(levelDTO);
         } catch (Exception e) {
@@ -151,7 +176,7 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
 
             level.setName(updates.getName());
             level.setSteps(updates.getSteps());
-            level.setExamnPath(updates.getExamnPath());
+            level.setExamFile(updates.getExamnPath());
             language.getLevels().set(index, level);
 
             // Save the updated language back to the repository
@@ -191,7 +216,7 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
                 level.setSteps(updates.getSteps());
             }
             if (updates.getExamnPath() != null ) {
-                level.setExamnPath(updates.getExamnPath());
+                level.setExamFile(updates.getExamnPath());
 
             }
 
@@ -212,8 +237,11 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
      //5 liste of submissions
 
     @GetMapping("/{idLang}/submissions")
-    ResponseEntity<List<StudentDTO>> getStudents(@PathVariable("idLang") String idLang) {
+    ResponseEntity<?> getStudents(@PathVariable("idLang") String idLang) {
         Language language = languageRepository.findByIdLang(idLang);
+        if (language == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("language not found");
+        }
         List<StudentInfo> studentInfos = language.getStudentInfos();
         if (studentInfos == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
@@ -221,7 +249,7 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
         List<StudentDTO> students = new ArrayList<>();
         for( StudentInfo studentInfo : studentInfos) {
             Student student = studentRepository.findByIdStudent(studentInfo.getIdStudent());
-            if (studentInfo.getExamSolutionPath() != null) {
+            if (studentInfo.getSolutionFile() != null) {
                 StudentDTO studentDTO = new StudentDTO();
 
                 studentDTO.setIdStudent(student.getIdStudent());
@@ -231,7 +259,10 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
                 studentDTO.setIdLang(language.getIdLang());
                 Level level = language.getLevels().get(studentInfo.getCurrentLevel());
                 studentDTO.setLevelName(level.getName());
-                studentDTO.setExamnSolutionPath(studentInfo.getExamSolutionPath());
+                studentDTO.setName(student.getName());
+                studentDTO.setFamilyname(student.getFamilyname());
+                studentDTO.setPhone(student.getPhone());
+                studentDTO.setExamnSolutionPath(studentInfo.getSolutionFile());
                 students.add(studentDTO);
             }
         }
@@ -289,7 +320,7 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
                 // Upgrade current level in student entity
                 studentInfo.setCurrentLevel(currentLevel + 1);
                 studentInfo.setCurrentStep(0);
-                studentInfo.setExamSolutionPath(null);
+                studentInfo.setSolutionFile(null);
                 int index = language.getStudentInfos().indexOf(studentInfo);
                 language.getStudentInfos().set(index, studentInfo); // Replace the old entry with the updated one
                 languageRepository.save(language);
@@ -300,5 +331,17 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while upgrading the level: " + e.getMessage());
         }
     }
+
+    //download  file solution exam
+    @GetMapping("/download/{filename:.+}")
+    public ResponseEntity<org.springframework.core.io.Resource> downloadFile(@PathVariable String filename) {
+
+        org.springframework.core.io.Resource resource = fileSytemStorage.loadFile(filename);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
+
 
 }

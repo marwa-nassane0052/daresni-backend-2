@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class ListLevelsDTO {
 
+    private String idLang;
     private String name;
     private Linguistic linguistic;
     private LanguageEnum language;
