@@ -47,7 +47,11 @@ public ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO
 
     // Check if language exists
     if (language == null) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Language not found");
+
+        language = new Language();
+        language.setLanguage(levelDTO.getLanguage());
+        language.setLinguistic(levelDTO.getLinguistic());
+        languageRepository.save(language);
     }
 
     if (language.getLevels() == null) {
