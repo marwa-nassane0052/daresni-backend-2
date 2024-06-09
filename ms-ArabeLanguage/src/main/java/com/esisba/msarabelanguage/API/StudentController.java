@@ -1,17 +1,25 @@
 package com.esisba.msarabelanguage.API;
 
+import com.esisba.msarabelanguage.DTO.LanguageDTO;
 import com.esisba.msarabelanguage.DTO.StepDTO;
 import com.esisba.msarabelanguage.DTO.Student.DetailLevelStudentDTO;
 import com.esisba.msarabelanguage.entities.Class.*;
+import com.esisba.msarabelanguage.fileManagement.service.IFileSytemStorage;
 import com.esisba.msarabelanguage.models.StudentAuth;
+import com.esisba.msarabelanguage.models.StudentAuthInfo;
 import com.esisba.msarabelanguage.proxies.StudentProxy;
 import com.esisba.msarabelanguage.repositories.LanguageRepository;
 import com.esisba.msarabelanguage.repositories.StudentRepository;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -33,8 +41,26 @@ public class StudentController {
     @Autowired
     StudentRepository studentRepository;
 
+    @Autowired
+    IFileSytemStorage fileSytemStorage;
     /************************************************** Student **************************************************************/
 
+    //0 Get languages have levels
+    @GetMapping("/languages")
+    public List<LanguageDTO> availableLanguages (){
+        List<LanguageDTO> languages = new ArrayList<>();
+        for(Language language : languageRepository.findAll()){
+            if (language.getLevels() != null && language.getLevels().size() > 0) {
+                LanguageDTO languageDTO = new LanguageDTO();
+                languageDTO.setIdLang(language.getIdLang());
+                languageDTO.setLanguage(language.getLanguage());
+                languageDTO.setLinguistic(language.getLinguistic());
+                languages.add(languageDTO);
+            }
+        }
+
+        return languages ;
+    }
 
     //1 verify if student exist
     @GetMapping("/isStudentIAL")
@@ -48,10 +74,16 @@ public class StudentController {
     //2  inscription of student in language level (learn)
     @PostMapping("/{idLang}/inscription")
     ResponseEntity<?> ArabeInscription( @PathVariable("idLang") String idLang,@RequestHeader("Authorization") String token) {
-        Student student;
 
-        StudentAuth studentAuth = studentProxy.getEtudiant(token);
         Language language = languageRepository.findByIdLang(idLang);
+
+        if( language.getLevels() == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is no level in this language");
+        }
+
+        Student student;
+        StudentAuth studentAuth = studentProxy.getEtudiant(token);
+        StudentAuthInfo studentAuthInfo = studentProxy.getEtudiantInfo(token);
 
         List<StudentInfo> studentInfos = language.getStudentInfos();
 
@@ -80,6 +112,9 @@ public class StudentController {
                 student = new Student();
                 student.setIdStudent(studentAuth.getId());
                 student.setEmail(studentAuth.getEmail());
+                student.setFamilyname(studentAuthInfo.getFamilyname());
+                student.setName(studentAuthInfo.getName());
+                student.setPhone(studentAuthInfo.getPhone());
                 studentRepository.save(student);
             }
 
@@ -87,7 +122,6 @@ public class StudentController {
             studentInfos.add(new StudentInfo(studentAuth.getId(),null, 0,0));
             language.setStudentInfos(studentInfos);
             languageRepository.save(language);
-
             Level level = language.getLevels().get(0);
 
             DetailLevelStudentDTO detailLevelStudentDTO = new DetailLevelStudentDTO();
@@ -169,7 +203,7 @@ public class StudentController {
 
     //4 upload examSolution
     @PostMapping("/{idLang}/uploadExamSolution")
-    ResponseEntity<String> uploadExamSolution(@RequestHeader("Authorization") String token, @PathVariable("idLang") String idLang, @RequestParam String examSolutionPath) {
+    ResponseEntity<String> uploadExamSolution(@RequestHeader("Authorization") String token, @PathVariable("idLang") String idLang, @RequestParam MultipartFile solutionFile) {
         try {
             Student student = studentRepository.findByIdStudent(studentProxy.getEtudiant(token).getId());
             if (student == null) {
@@ -186,16 +220,22 @@ public class StudentController {
                 studentInfos = new ArrayList<>();
             }
 
-            Optional<StudentInfo> idStudentAndExamSolutionsOp = studentInfos.stream()
+            Optional<StudentInfo> studentInfoOP = studentInfos.stream()
                     .filter(idStudentAndExamexist -> idStudentAndExamexist.getIdStudent().equalsIgnoreCase(student.getIdStudent()))
                     .findFirst();
 
-            if (!idStudentAndExamSolutionsOp.isPresent()) {
+            if (!studentInfoOP.isPresent()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("You can upload exam solution , just if you learn this laguage");
             }
 
-            StudentInfo studentInfo = idStudentAndExamSolutionsOp.get();
-            studentInfo.setExamSolutionPath(examSolutionPath);
+            StudentInfo studentInfo = studentInfoOP.get();
+
+            String upfile = fileSytemStorage.saveFile(solutionFile);
+            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/admin/download/")
+                    .path(upfile)
+                    .toUriString();
+            studentInfo.setSolutionFile(upfile);
             int index = language.getStudentInfos().indexOf(studentInfo);
             language.getStudentInfos().set(index, studentInfo); // Replace the old entry with the updated one
             languageRepository.save(language);
@@ -209,7 +249,7 @@ public class StudentController {
 
     //5 download exam of level
     @GetMapping("/{langId}/downloadExam")
-    ResponseEntity<String> downloadedExam(@RequestHeader("Authorization") String token, @PathVariable("langId") String langId) {
+    ResponseEntity<?> downloadedExam(@RequestHeader("Authorization") String token, @PathVariable("langId") String langId) {
 
         Student student = studentRepository.findByIdStudent(studentProxy.getEtudiant(token).getId());
         Language language = languageRepository.findByIdLang(langId);
@@ -222,7 +262,7 @@ public class StudentController {
         List<StudentInfo> studentInfos = language.getStudentInfos();
 
         if (studentInfos == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student info list not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("You are not inscribed in this language ");
         }
 
         Optional<StudentInfo> studentInfoOp = studentInfos.stream()
@@ -238,8 +278,11 @@ public class StudentController {
 
         Level level = language.getLevels().get(currentLevel);
         if (currentStep + 1 == level.getSteps().size()) {
-            if (level.getExamnPath() != null) {
-                return ResponseEntity.status(HttpStatus.OK).body(level.getExamnPath());
+            if (level.getExamFile() != null) {
+                org.springframework.core.io.Resource resource = fileSytemStorage.loadFile(level.getExamFile());
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No exam found");
             }
@@ -256,6 +299,10 @@ public class StudentController {
         StudentAuth studentAuth = studentProxy.getEtudiant(token);
         return studentRepository.findByIdStudent(studentAuth.getId());
     }
+
+
+
+
 
 
 }

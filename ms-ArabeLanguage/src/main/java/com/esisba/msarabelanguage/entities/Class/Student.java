@@ -16,6 +16,9 @@ public class Student {
     @Id
     private String idStudent;
     private String email;
+    private String name;
+    private String familyname;
+    private Long phone;
     private List<String> learnedLanguage ;
 
 }

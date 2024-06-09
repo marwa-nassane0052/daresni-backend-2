@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class StudentInfo {
 
     private String idStudent;
-    private String examSolutionPath;
+    private String solutionFile;
     private int currentStep;
     private int  currentLevel;
 }

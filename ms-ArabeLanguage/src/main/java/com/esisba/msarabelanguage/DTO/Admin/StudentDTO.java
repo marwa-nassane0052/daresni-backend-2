@@ -8,10 +8,14 @@ import lombok.Data;
 public class StudentDTO {
 
     private String idStudent;
-    private String  examnSolutionPath;
     private String email;
+    private String name;
+    private String familyname;
+    private Long phone;
     private String idLang;
     private LanguageEnum language ;
     private Linguistic linguistic ;
     private String levelName ;
+    private String examnSolutionPath;
+
 }
