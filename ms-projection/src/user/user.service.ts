@@ -31,5 +31,18 @@ export class UserService implements OnModuleInit {
         },
       },
     );
+
+    await this.consumerService.consume('deleteProf-consumer',
+    { topics: ['delete_prof'] },
+    {
+      eachMessage: async ({ topic, partition, message }) => {
+          const messageString = message.value.toString();
+          const eventData = JSON.parse(messageString);
+          console.log("the id",eventData)
+          await this.profModel.deleteOne({id_prof:eventData.id_prof})
+      
+      },
+    },
+  );
   }
 }

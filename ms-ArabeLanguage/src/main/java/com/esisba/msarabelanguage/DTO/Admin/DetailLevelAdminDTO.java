@@ -17,4 +17,3 @@ public class DetailLevelAdminDTO {
     private List<Step> steps;
     private String examnPath;
 }
-

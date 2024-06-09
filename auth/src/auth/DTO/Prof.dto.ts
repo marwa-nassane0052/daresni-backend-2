@@ -19,9 +19,5 @@ export class ProfDTO {
   @IsOptional()
   phone?: string;
 
-  @IsString()
-  Cv?: string;
-
-  @IsString()
-  picture?: string;
+ 
 }

@@ -59,14 +59,14 @@ export class GroupController {
     //add student in group
     @Post('/addStudent')
     @UseGuards(AuthGuard,StudentGurad)
-    async addStudentToGRoup(@Body() requireData:{idGC:string,idGroup:string},@Request() request,@Res() res:Response){
+    async addStudentToGRoup(@Body() requireData:{idGC:string,idGroup:string},@Request() request){
 
         try{
             const idStudent=request.student.id
-            
+           
             const resulte= await this.groupService.addStudent(idStudent,requireData.idGC,requireData.idGroup)
           
-            return res.status(HttpStatus.ACCEPTED).json(resulte)
+            return resulte
             /* return res.status(HttpStatus.OK).json("etudiant a été ajouté dans  ce group group avec succès")*/
             
         }catch(err){
@@ -92,6 +92,8 @@ export class GroupController {
     async getGroupsOfStudent(@Request() request,@Res() res:Response){
         try{
             const idStudent=request.student.id
+           
+            
             const studentGroups=await this.groupService.getGroupDetailOfSTudent(idStudent)
             return res.status(HttpStatus.OK).json(studentGroups)
 
@@ -197,9 +199,58 @@ async test3(@Param("name") name:string,@Param("email") email:string){
     return  name
 }
 
+@Get('studentGroup/:idG')
+async getStudentGroup(@Param('idG') idG:string){
+    try{
+        return await this.groupService.getStudentOfGroup(idG)
+    }catch(err){
+        console.log(err)
+    }
+
+}
 
 
 
+@Get('studentPayment')
+@UseGuards(AuthGuard,ProfGuard)
+async getPaymentStudent(@Request() request){
+    try{
+        return await this.groupService.getPaymentStudent(request.prof.id)
+    }catch(err){
+        console.log(err)
+    }
+
+}
+
+@Get('allPayment')
+async getAllPayment(){
+    try{
+        return await this.groupService.getAllPayment()
+    }catch(err){
+        console.log(err)
+    }
+
+}
+
+@Get('groupInfo/:id')
+async getGroupInfoBYId(@Param('id') id:string){
+    try{
+        return await this.groupService.getGroupById(id)
+    }catch(err){
+        console.log(err)
+    }
+
+}
+
+@Get('msg')
+async returnResponse(){
+    try{
+        return await this.groupService.getMessageErrore()
+    }catch(err){
+        console.log(err)
+    }
+
+}
 
 
 }

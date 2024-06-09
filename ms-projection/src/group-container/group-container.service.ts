@@ -13,8 +13,8 @@ export class GroupContainerService implements OnModuleInit {
         @InjectModel(GroupContainer.name) private groupContainerModel:Model<GroupContainer>
         ) {}
     async onModuleInit() {
-        await this.consumerService.consume('groupContainer-consumer',
-          { topics: ['croupContainer_created'] },
+        await this.consumerService.consume('new_groupContainer_consumer',
+          { topics: ['new_croupContainer_created'] },
           {
             eachMessage: async ({ topic, partition, message }) => {
 
@@ -58,11 +58,25 @@ export class GroupContainerService implements OnModuleInit {
                   croupContainerId:eventData.validateGC._id
                   })
                 groupContainer.valide=true
+                console.log(groupContainer)
                 await groupContainer.save()
               
             },
           },
         );
+
+        await this.consumerService.consume('deletesession-consumer',
+        { topics: ['refuse_session'] },
+        {
+          eachMessage: async ({ topic, partition, message }) => {
+              const messageString = message.value.toString();
+              const eventData = JSON.parse(messageString);
+              console.log("the id",eventData)
+              await this.groupContainerModel.deleteOne({croupContainerId:eventData.idS})
+          
+          },
+        },
+      );
       }
 
 

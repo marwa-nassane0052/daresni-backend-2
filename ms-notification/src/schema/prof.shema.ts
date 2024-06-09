@@ -14,6 +14,11 @@ export class Prof {
     @Prop()
     familyname:string
 
+    @Prop()
+    email:string
+
+
+
 }
 
 export const profSchema = SchemaFactory.createForClass(Prof);

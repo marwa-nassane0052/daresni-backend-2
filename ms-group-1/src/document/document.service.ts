@@ -10,18 +10,18 @@ export class DocumentService {
     @InjectModel(GroupContainer.name) private groupContainer:Model<GroupContainer>
 ){}
 
-async addPathFileInDB(idGC:string,idGroup:string,path:string){
-    const groupContainer=await this.groupContainer.findById(idGC)
-    const objectId=new mongoose.Types.ObjectId(idGroup)
-    if(groupContainer.groups.includes(objectId)){
+async addPathFileInDB(idGroup:string,path:string){
+
+
+
         const group=await this.groupModel.findById(idGroup)
         group.document.push(path)
         await group.save()
         return group
-    }
+    
 }
-async getDocuments(idGC:string,idGroup:string){
-    const groupContainer=await this.groupContainer.findById(idGC)
+async getDocuments(idGroup:string){
+
   
         const group=await this.groupModel.findById(idGroup)
         return group.document

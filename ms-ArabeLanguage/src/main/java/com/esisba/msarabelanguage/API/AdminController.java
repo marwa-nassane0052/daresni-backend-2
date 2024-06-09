@@ -8,19 +8,27 @@ import com.esisba.msarabelanguage.entities.Class.*;
 import com.esisba.msarabelanguage.proxies.StudentProxy;
 import com.esisba.msarabelanguage.repositories.LanguageRepository;
 import com.esisba.msarabelanguage.repositories.StudentRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 @RestController
 @RequestMapping("admin")
 public class AdminController {
@@ -40,6 +48,9 @@ public class AdminController {
 /************************************************** Admin **************************************************************/
 
     //1 add new Level
+
+
+
     @PostMapping("/addLevel")
     ResponseEntity<String> addLevel(@RequestBody DetailLevelAdminDTO levelDTO ) {
         Language language = languageRepository.findByLanguageAndLinguistic(levelDTO.getLanguage(), levelDTO.getLinguistic());
@@ -62,7 +73,6 @@ public class AdminController {
         return ResponseEntity.ok("Level added Successfully");
 
     }
-
     //2 get List Of Levels (All)
     @GetMapping("/levels/all")
     List<ListLevelsDTO> getlevels() {

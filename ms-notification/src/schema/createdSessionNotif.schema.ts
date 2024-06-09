@@ -15,6 +15,9 @@ export class SessionCreatedNotification {
     familyname:string
 
     @Prop()
+    email:string
+
+    @Prop()
     moduleName:string
 
     @Prop()

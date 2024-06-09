@@ -2,11 +2,13 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ConsumerService } from 'src/kafka/consumer/consumer.service';
+import { Notification } from 'src/schema/notification';
 import { Prof } from 'src/schema/prof.shema';
 @Injectable()
 export class ProfService implements OnModuleInit {
     constructor(private readonly consumerService: ConsumerService,
         @InjectModel(Prof.name) private Prof:Model<Prof>,
+        @InjectModel(Notification.name) private Notification:Model<Notification>
         ) {}
     async onModuleInit() {
         await this.consumerService.consume('prof-consumer',
@@ -24,7 +26,14 @@ export class ProfService implements OnModuleInit {
                 phone:eventData.phone
             })
             await newProf.save()
-            console.log(newProf)    
+            const notification=new this.Notification({
+                name:eventData.name,
+                familyname:eventData.familyname,
+                email:eventData.email,
+                userType:"admin",
+                notificationContent:"un nouveau professeur demande d'inscription dans la plateforme"
+            })
+            await notification.save()
         },
       },
     );

@@ -52,7 +52,7 @@ export class AuthService {
   }
 
   //prof signup
-  async signupProf(createUserDto: UserDTO, userData:ProfDTO): Promise<any> {
+  async signupProf(createUserDto: UserDTO, userData:ProfDTO,Cv:string,picture:string): Promise<any> {
     const existingUser = await this.userModel.findOne({
       email: createUserDto.email,
     });
@@ -69,7 +69,7 @@ export class AuthService {
     });
     await user.save();
 
-    const prof = new this.profModel({ ...userData, user: user._id });
+    const prof = new this.profModel({ ...userData, user: user._id ,Cv,picture});
     await prof.save();
 
     const token = this.jwtService.sign({ email: user.email, id: user.id });
@@ -235,6 +235,53 @@ export class AuthService {
     try{
       const prof=await this.profModel.findOne()
       return prof
+    }catch(err){
+      console.log(err)
+    }
+  }
+
+  async deleteProf(idP:string){
+    try{
+     await this.userModel.findByIdAndDelete(idP)
+     await this.profModel.deleteOne({user:idP})
+     return `user ${idP} deleted `
+    }catch(err){
+      console.log(err)
+    }
+  }
+
+  async StudentInfoBYId(idS:string){
+    try{
+      return await this.studentModel.findOne({user:idS})
+    }catch(err){
+      console.log(err)
+    }
+  }
+
+  //number of prof
+  async profNumber(){
+    try{
+      const count = await this.userModel.countDocuments({role:'prof',isActive:true});
+      return count;
+    }catch(err){
+      console.log(err)
+    }
+  }
+  
+  //student number
+  async studentNumber(){
+    try{
+      const count = await this.studentModel.countDocuments({});
+      return count;
+    }catch(err){
+      console.log(err)
+    }
+  }
+
+  async profById(idP:string){
+    try{
+      const count = await this.profModel.findOne({user:idP})
+      return count;
     }catch(err){
       console.log(err)
     }

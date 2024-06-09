@@ -1,11 +1,15 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
+  Param,
   Post,
   Req,
+  Res,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -15,18 +19,45 @@ import { LoginDTO } from './DTO/login.dto';
 import { ProfDTO } from './DTO/Prof.dto';
 import { StudentDTO } from './DTO/Student.dto';
 import { ProducerService } from 'src/kafka/producer/producer.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { use } from 'passport';
+import { diskStorage } from 'multer';
+import * as path from 'path';
+import { Response } from 'express';
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,private readonly producerService:ProducerService) {}
 //signUp prof
   @Post('signup/prof')
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'Cv', maxCount: 1 },
+    { name: 'picture', maxCount: 1 }
+  ], {
+    storage: diskStorage({
+      destination: './uploads',
+      filename: (req, file, cb) => {
+        const filename: string = path.parse(file.originalname).name.replace(/\s/g, '');
+        const extension: string = path.parse(file.originalname).ext;
+        cb(null, `${filename}${extension}`);
+      },
+    }),
+  }))
   async signupProf(
     @Body() createUserDto: UserDTO,
     @Body() profileDto: ProfDTO,
+    @UploadedFiles() files: { Cv?: Express.Multer.File[], picture?: Express.Multer.File[] }
+
   ) {
-    const createdProf=await this.authService.signupProf(createUserDto, profileDto);
+
+
+    const cvFile = files.Cv?.[0];
+    const pictureFile = files.picture?.[0];
+    const cvPath = `./upload/${cvFile.filename}`;
+    const picturePath = `./upload/${pictureFile.filename}`;
+
+
+    const createdProf=await this.authService.signupProf(createUserDto, profileDto,cvPath,picturePath);
     await this.producerService.produce({
       topic:'user_created',
       messages:[
@@ -59,6 +90,38 @@ export class AuthController {
     return createdProf
   }
 
+
+//get cv and prof picture
+@Get('/getDocuments/:idP')
+async getDocuments(@Param('idP') idP:string){
+  try{
+    
+    const prof=await this.authService.profById(idP)
+    
+   const absolutePathCV = path.resolve(String(prof.Cv));
+   const absolutePathPicture = path.resolve(String(prof.picture));
+
+    return {
+    cvPath: absolutePathCV,
+    picturePath: absolutePathPicture,
+  };
+  }catch(err){
+    console.log(err)
+  }
+}
+
+@Get('fileContent/:filename')
+async getFileContent(@Param('filename') filename: string, @Res() res: Response) {
+  try {
+    // Construct the absolute file path
+    const filePath = path.resolve(`/home/marwa/Desktop/backend/auth/uploads/${filename}`);
+    // Send the file
+    res.sendFile(filePath);
+  } catch (err) {
+    console.error(err);
+    
+  }
+}
 
 
 //signup Student
@@ -139,5 +202,50 @@ export class AuthController {
     
     const user=await this.authService.getProfInfoByIdUser(id)
     return user
+  }
+
+  @Delete('deleteProf/:idP')
+  async deleteProfBYId(@Param('idP') idP:string) {
+
+    await this.producerService.produce({
+      topic:'delete_prof',
+      messages:[
+        {
+            value:JSON.stringify({
+              id_prof:idP              
+            })
+        }
+    ]
+    })
+    return await this.authService.deleteProf(idP)
+  }
+
+  @Get('/studentInfo/:idS')
+  async getStudentById(@Param('idS') idS:string){
+    try{
+      return await this.authService.StudentInfoBYId(idS)
+    }catch(err){
+      console.log(err)
+    }
+
+  }
+
+  @Get('/profNumber')
+  async profNumber(){
+    try{
+      return await this.authService.profNumber()
+    }catch(err){
+      console.log(err)
+    }
+
+  }
+  @Get('/stdeuntNumber')
+  async studentNumber(){
+    try{
+      return await this.authService.studentNumber()
+    }catch(err){
+      console.log(err)
+    }
+
   }
 }

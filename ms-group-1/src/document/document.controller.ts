@@ -22,13 +22,13 @@ export class DocumentController {
             },
         })     
     }))
-    async uploadDocument(@Body()requireData:{idGC:string,idGroup:string} ,@UploadedFile() file: Express.Multer.File){
+    async uploadDocument(@Body()requireData:{idGroup:string} ,@UploadedFile() file: Express.Multer.File){
       try{
         if (!file) {
             throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);     
         }
         const filePath = `./upload/${file.filename}`;
-        await this.documentService.addPathFileInDB(requireData.idGC,requireData.idGroup,filePath)
+        await this.documentService.addPathFileInDB(requireData.idGroup,filePath)
         return filePath
       }catch(err){
         console.log(err)
@@ -37,28 +37,40 @@ export class DocumentController {
     }
 
     //get files
-    @Get('/getDocuments')
-    async getDocuments(@Body()requireData:{idGC:string,idGroup:string},@Res() res:Response){
+    @Get('/getDocuments/:idGroup')
+    async getDocuments(@Param('idGroup') idGroup:string){
       try{
         
-        const documentsPath=await this.documentService.getDocuments(requireData.idGC,requireData.idGroup)
+        const documentsPath=await this.documentService.getDocuments(idGroup)
        
           const documents=[]
           documentsPath.forEach((e)=>{
             const absolutePath = path.resolve(String(e));
             documents.push(absolutePath)
           })
-          return res.status(HttpStatus.FOUND).json(documents)
+          return documents
 
       }catch(err){
         console.log(err)
       }
     }
-    @Get('fileContant')
-    async getFileCOntant(@Body() data:{ path:string},@Res() res:Response){
-      return res.sendFile(data.path)
     
-    }
+  
+  @Get('fileContent/:filename')
+  async getFileContent(@Param('filename') filename: string, @Res() res: Response) {
+    try {
+      // Construct the absolute file path
+      const filePath = path.resolve(`/home/marwa/Desktop/backend/ms-group-1/upload/${filename}`);
 
+   
+    
+
+      // Send the file
+      res.sendFile(filePath);
+    } catch (err) {
+      console.error(err);
+      
+    }
+  }
 }
 

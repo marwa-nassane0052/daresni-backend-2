@@ -178,6 +178,66 @@ export class SessionService {
             throw new Error(`Failed to get groups of session: ${err.message}`);
         }
     }
+
+    async deleteSession(idS:String){
+        try{
+           await this.groupContainer.findByIdAndDelete(idS)
+           return `the ${idS} has been deleted`
+        }catch(err){
+            console.log(err)
+        }
+    }
+    
+    async sessionNumber(){
+        try{
+           return await this.groupContainer.countDocuments({valide:true});
+           
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+    async sessionNumberForProf(idP:string){
+        try{
+           return await this.groupContainer.countDocuments({valide:true,profId:idP});
+           
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+    async getNumberOfGroup() {
+        try {
+            return await this.groupModel.countDocuments()
+            
+        } catch (err) {
+            console.log(err);
+        }
+    }
+    async getAllProfit() {
+        try {
+            const sessions = await this.groupContainer.find();
+            let totalProfit = 0; // Initialize the totalProfit to accumulate the profit
+    
+            for (const session of sessions) {
+                const price: number = Number(session.price);
+                for (const groupId of session.groups) {
+
+                    const group = await this.groupModel.findById(groupId);
+                    if (group) {
+                        const studentCount: number = group.studentList.length;
+
+                        totalProfit +=  price *studentCount
+                    }
+                }
+            }
+    
+            return totalProfit; // Return the accumulated profit
+        } catch (err) {
+            console.log(err);
+            throw err; // Optional: rethrow the error if you want to handle it elsewhere
+        }
+    }
     
 
 }

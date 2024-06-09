@@ -6,6 +6,7 @@ import { CreateGroupDto } from 'src/Dto/createGroup.dto';
 import { GroupContainer } from 'src/Entity/groupContainer';
 import { group } from 'console';
 import { EurekaModule } from 'nestjs-eureka';
+import axios from 'axios';
 
 
 @Injectable()
@@ -23,6 +24,7 @@ export class GroupService {
 
     async getGroupById(idGroup:string){
         const group= await this.groupModel.findById(idGroup)
+    return group
     }
 
     async getGroupContainerById(idGroupContainer:string){
@@ -190,6 +192,7 @@ export class GroupService {
             const groupsContainer = await Promise.all(groups.map(async (e) => {
                 const gp = await this.groupContainer.findById(e.groupContainer);
                 return {
+                    idGC:gp._id,
                     modulename:gp.moduleName,
                     price:gp.price,
                     group:e
@@ -275,6 +278,7 @@ export class GroupService {
                         await Promise.all(p.dates.map(async (t) => {
                             const endingDate = await this.addHoursToDate(t, 6);
                             planning.push({
+
                                 StartingDate: t,   
                                 endingDate:endingDate,                             
                                 info:`group name: ${group.groupName} module:${gc.moduleName} level: ${gc.level} year: ${gc.year} speciality: ${gc.speciality}`
@@ -296,7 +300,93 @@ export class GroupService {
         const newDate = new Date(originalDate);
         newDate.setHours(newDate.getHours() + hoursToAdd);
         return newDate;
+    }
+
+    async getStudentOfGroup(idG:string){
+        try{
+            const student = [];
+            const group = await this.groupModel.findById(idG);
+            
+            const studentPromises = group.studentList.map(async (e) => {
+              const user = await axios.get(`http://localhost:3001/auth/studentInfo/${e}`);
+              return user.data; // Assuming you want the data from the response
+            });
+      
+            const students = await Promise.all(studentPromises);
+            return students;
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+    async getPaymentStudent(idProf:string) {
+        try {
+          const sessions = await this.groupContainer.find({ profId: idProf });
+          const students = [];
+      
+          for (const session of sessions) {
+            for (const groupId of session.groups) {
+              const group = await this.groupModel.findById(groupId);
+              for (const studentId of group.studentList) {
+                const userResponse = await axios.get(`http://localhost:3001/auth/studentInfo/${studentId}`);
+                const userData = userResponse.data;
+      
+                userData.price =session.price 
+      
+                students.push(userData);
+              }
+            }
+          }
+      
+          return students; // Return the collected student data
+        } catch (err) {
+          console.log(err);
+          throw err; // Optional: rethrow the error if you want to handle it elsewhere
+        }
       }
+
+
+      async getAllPayment() {
+        try {
+          const sessions = await this.groupContainer.find();
+          const students = [];
+      
+          for (const session of sessions) {
+            for (const groupId of session.groups) {
+              const group = await this.groupModel.findById(groupId);
+              for (const studentId of group.studentList) {
+                const userResponse = await axios.get(`http://localhost:3001/auth/studentInfo/${studentId}`);
+                const userData = userResponse.data;
+      
+                userData.price =session.price 
+      
+                students.push(userData);
+              }
+            }
+          }
+      
+          return students; // Return the collected student data
+        } catch (err) {
+          console.log(err);
+          throw err; // Optional: rethrow the error if you want to handle it elsewhere
+        }
+      }
+      
+
+      async getMessageErrore(){
+        try{
+            return{
+                 success : false,
+                 message: "Solde insuffisant pour effectuer le paiement."
+             }
+
+        }catch(err){
+            console.log(err)
+        }
+      }
+
+     
+
 }
     
   
