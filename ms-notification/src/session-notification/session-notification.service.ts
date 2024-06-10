@@ -49,7 +49,7 @@ export class SessionNotificationService {
 
 
         await this.consumerService.consume('validate_notification_consumer',
-        { topics: ['validate_session_notification_2'] },
+        { topics: ['validate_session_notification'] },
         {
           eachMessage: async ({ topic, partition, message }) => {
               const messageString = message.value.toString();
@@ -73,7 +73,7 @@ export class SessionNotificationService {
 
 
       await this.consumerService.consume('refuse_notification_consumer',
-        { topics: ['refuse_session_notification_2'] },
+        { topics: ['session_refuse_notification'] },
         {
           eachMessage: async ({ topic, partition, message }) => {
               const messageString = message.value.toString();

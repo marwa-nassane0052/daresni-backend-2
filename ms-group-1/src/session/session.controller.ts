@@ -30,17 +30,17 @@ export class SessionController {
     //cretae a session for cem student
     @Post('/createGroupContainerCem')
     @UseGuards(AuthGuard, ProfGuard)
-    async createGroupContainerCem(@Body() CreateGcDto: CreateGcDto, @Res() res: Response, @Request() request) {
+    async createGroupContainerCem(@Body() CreateGcDto: CreateGcDto,  @Request() request) {
 
         try {
 
             const gorupContainer = await this.groupCntainerService.findGroupContainer(request.prof.id, CreateGcDto)
             if (gorupContainer) {
-                return res.status(HttpStatus.CONFLICT).json("vous ne pouvez pas créer deux session avec les meme information")
+                return "vous ne pouvez pas créer deux session avec les meme information"
             } else {
                 const createGc = await this.groupCntainerService.createGroupContainerCem(request.prof.id, CreateGcDto)
                 await this.producerService.produce({
-                    topic: 'new_croupContainer_created',
+                    topic: 'groupContainer_created_event',
                     messages: [
                         {
                             value: JSON.stringify({
@@ -51,7 +51,7 @@ export class SessionController {
                     ]
                 })
                 await this.producerService.produce({
-                    topic: 'session_notification_new_2',
+                    topic: 'session_notification_created',
                     messages: [
                         {
                             value: JSON.stringify({
@@ -62,7 +62,7 @@ export class SessionController {
                     ]
                 })
 
-                return res.status(HttpStatus.CREATED).json(createGc)
+                return  createGc
             }
         } catch (err) {
             console.log(err)
@@ -82,7 +82,7 @@ export class SessionController {
             } else {
                 const createGc = await this.groupCntainerService.createGroupContainerLycee(request.prof.id, CreateGcDto)
                 await this.producerService.produce({
-                    topic: 'new_croupContainer_created',
+                    topic: 'groupContainer_created_event',
                     messages: [
                         {
                             value: JSON.stringify({
@@ -93,7 +93,7 @@ export class SessionController {
                     ]
                 })
                 await this.producerService.produce({
-                    topic: 'session_notification_new_2',
+                    topic: 'session_notification_created',
                     messages: [
                         {
                             value: JSON.stringify({
@@ -126,7 +126,7 @@ export class SessionController {
         try {
             const validateGC = await this.groupCntainerService.validateGroupContainer(idGC)
             await this.producerService.produce({
-                topic: 'validate_group',
+                topic: 'validate_group_2',
                 messages: [
                     {
                         value: JSON.stringify({
@@ -137,7 +137,7 @@ export class SessionController {
             })
 
             await this.producerService.produce({
-                topic: 'validate_session_notification_2',
+                topic: 'validate_session_notification',
                 messages: [
                     {
                         value: JSON.stringify({
@@ -147,10 +147,17 @@ export class SessionController {
                 ]
             })
 
-            //envoyer axios pour forum
-           //await axios.post(`http://localhost:3030/forum/createforum/${validateGC._id}`);
-            //envoyer axios pour messagerie
-            //await axios.post(`http://localhost:3030/messagerie/chatgroups/${validateGC._id}`);
+            if (!validateGC || !validateGC._id) {
+                throw new Error("Invalid Group Container");
+            }
+    
+            // Send request to create forum
+            const forumResponse = await axios.post(`http://localhost:3030/forum/createforum/${validateGC._id}`);
+            console.log("Forum Response:", forumResponse.data);
+    
+            // Send request to create chat group
+            const chatGroupResponse = await axios.post(`http://localhost:3030/messagerie/${validateGC._id}/chatgroups`);
+            console.log("Chat Group Response:", chatGroupResponse.data);
             return res.status(HttpStatus.OK).json(validateGC)
         } catch (err) {
             console.log(err)
@@ -235,7 +242,7 @@ export class SessionController {
         try {
             //res.status(HttpStatus.OK).json("the session refused");
             await this.producerService.produce({
-                topic: 'refuse_session',
+                topic: 'refuse_session_2',
                 messages: [
                     {
                         value: JSON.stringify({
@@ -245,7 +252,7 @@ export class SessionController {
                 ]
             })
             await this.producerService.produce({
-                topic: 'refuse_session_notification_2',
+                topic: 'session_refuse_notification',
                 messages: [
                     {
                         value: JSON.stringify({

@@ -10,7 +10,7 @@ import { GroupContainerModule } from './group-container/group-container.module';
 import { EurekaModule } from 'nestjs-eureka';
 
 @Module({
-  imports: [MongooseModule.forRoot('mongodb+srv://mnassane:123456789Marwa@cluster0.9hn0nt1.mongodb.net/projection?retryWrites=true&w=majority&appName=Cluster0'), KafkaModule, GroupModule, UserModule, GroupContainerModule],  
+  imports: [MongooseModule.forRoot('mongodb://localhost:27017/ms-projection'), KafkaModule, GroupModule, UserModule, GroupContainerModule],  
   controllers: [AppController],
   providers: [AppService,ConsumerService],
 })

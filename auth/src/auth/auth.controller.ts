@@ -59,7 +59,7 @@ export class AuthController {
 
     const createdProf=await this.authService.signupProf(createUserDto, profileDto,cvPath,picturePath);
     await this.producerService.produce({
-      topic:'user_created',
+      topic:'user_created_2',
       messages:[
         {
             value:JSON.stringify({
@@ -73,7 +73,7 @@ export class AuthController {
     ]
     })
     await this.producerService.produce({
-      topic:'prof_created_notification_2',
+      topic:'prof_notification_created',
       messages:[
         {
             value:JSON.stringify({
@@ -122,6 +122,7 @@ async getFileContent(@Param('filename') filename: string, @Res() res: Response) 
     
   }
 }
+
 
 
 //signup Student
@@ -208,7 +209,7 @@ async getFileContent(@Param('filename') filename: string, @Res() res: Response) 
   async deleteProfBYId(@Param('idP') idP:string) {
 
     await this.producerService.produce({
-      topic:'delete_prof',
+      topic:'delete_prof_2',
       messages:[
         {
             value:JSON.stringify({

@@ -11,8 +11,8 @@ export class ProfService implements OnModuleInit {
         @InjectModel(Notification.name) private Notification:Model<Notification>
         ) {}
     async onModuleInit() {
-        await this.consumerService.consume('prof-consumer',
-      { topics: ['prof_created_notification_2'] },
+        await this.consumerService.consume('prof-consumer-2',
+      { topics: ['prof_notification_created'] },
       {
         eachMessage: async ({ topic, partition, message }) => {
             const messageString = message.value.toString();

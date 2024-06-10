@@ -10,8 +10,8 @@ export class GroupService implements OnModuleInit {
       @InjectModel(GroupContainer.name) private groupContainerModel:Model<GroupContainer>,
       ) {}
     async onModuleInit() {
-        await this.consumerService.consume('group-consumer',
-          { topics: ['group_cretaed'] },
+        await this.consumerService.consume('group-consumer-2',
+          { topics: ['group_created_event'] },
           {
             eachMessage: async ({ topic, partition, message }) => {
               const messageString = message.value.toString();

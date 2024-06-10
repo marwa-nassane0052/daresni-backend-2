@@ -42,7 +42,7 @@ export class GroupController {
         }
         const createdGroup= await this.groupService.createGroup(idGC,creategroupDto)
         await this.producerService.produce({
-            topic:'group_cretaed',
+            topic:'group_created_event',
                 messages:[
                     {
                         value:JSON.stringify({

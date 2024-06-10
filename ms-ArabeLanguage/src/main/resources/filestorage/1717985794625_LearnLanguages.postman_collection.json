@@ -1,0 +1,357 @@
+{
+	"info": {
+		"_postman_id": "201befcf-eac9-4959-ac68-369ade96ab21",
+		"name": "LearnLanguages",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32899088"
+	},
+	"item": [
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "add Level",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"A5\",\r\n    \"linguistic\":\"vocabulaire\",\r\n    \"language\":\"francais\",\r\n    \"examnPath\":\"path/to/exam/A4\",\r\n    \"steps\":[\r\n        {\"title\":\"arabe A51\" , \"content\":\" content arabe A51 \"},\r\n        {\"title\":\"arabe A52\" , \"content\":\" content arabe A52 \"},\r\n        {\"title\":\"arabe A53\" , \"content\":\" content arabe A53 \"}\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/admin/addLevel",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"admin",
+								"addLevel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Levels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/admin/levels/all",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"admin",
+								"levels",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Level",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/admin/2/levels/A1",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"admin",
+								"2",
+								"levels",
+								"A1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "level",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"steps\":[\r\n        {\"title\":\"title  arabe 1\" , \"content\": \"content arabe 1\"},\r\n        {\"title\":\"title  arabe 2\" , \"content\": \"content arabe 2\"},\r\n        {\"title\":\"title  arabe 3\" , \"content\": \"content arabe 3\"},\r\n        {\"title\":\"title  arabe 4\" , \"content\": \"content arabe 4\"}\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/admin/1/levels/A1/update",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"admin",
+								"1",
+								"levels",
+								"A1",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "submissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/admin/2/submissions",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"admin",
+								"2",
+								"submissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upgrade Level",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/admin/2/submissions/662ee7be7fe26416cf6761d0/upgradeLevel",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"admin",
+								"2",
+								"submissions",
+								"662ee7be7fe26416cf6761d0",
+								"upgradeLevel"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "languages",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/student/languages",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"student",
+								"languages"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "student",
+			"item": [
+				{
+					"name": "Inscription",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hLnNpZGVsbXJhYmV0QGdtYWlsLmNvbSIsImlkIjoiNjYyZWU3YmU3ZmUyNjQxNmNmNjc2MWQwIiwiaWF0IjoxNzE3NzkxODk2LCJleHAiOjE3MTc4NzgyOTZ9.f658RUhxhBe66aiokLcMxv_5yi4PrZc00NX72Was23Q",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/student/2/inscription",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"student",
+								"2",
+								"inscription"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Next Step",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hLnNpZGVsbXJhYmV0QGdtYWlsLmNvbSIsImlkIjoiNjYyZWU3YmU3ZmUyNjQxNmNmNjc2MWQwIiwiaWF0IjoxNzE3NjI5NDUxLCJleHAiOjE3MTc3MTU4NTF9.E4e5r-swU971NiqvBFs0K5TEA0u-VKDOLZjB-X7H26Y",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/student/2/2/upgradeStep",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"student",
+								"2",
+								"2",
+								"upgradeStep"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "download exam",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hLnNpZGVsbXJhYmV0QGdtYWlsLmNvbSIsImlkIjoiNjYyZWU3YmU3ZmUyNjQxNmNmNjc2MWQwIiwiaWF0IjoxNzE3NjI5NDUxLCJleHAiOjE3MTc3MTU4NTF9.E4e5r-swU971NiqvBFs0K5TEA0u-VKDOLZjB-X7H26Y",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/student/2/downloadExam",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"student",
+								"2",
+								"downloadExam"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload exam",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImF5YW1hbGVrQGdtYWlsLmNvbSIsImlkIjoiNjY2MGRlZTNmODk1ZmI2NThmYWRkZTg3IiwiaWF0IjoxNzE3NzkzMTQwLCJleHAiOjE3MTc4Nzk1NDB9.vnihYzGDTenJpJQzmKssT19Itm2uSdiLN35d9xf2Dqg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/student/2/uploadExamSolution?examSolutionPath=my/path/exam/solution/s2",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"student",
+								"2",
+								"uploadExamSolution"
+							],
+							"query": [
+								{
+									"key": "examSolutionPath",
+									"value": "my/path/exam/solution/s2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "student Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hLnNpZGVsbXJhYmV0QGdtYWlsLmNvbSIsImlkIjoiNjYyZWU3YmU3ZmUyNjQxNmNmNjc2MWQwIiwiaWF0IjoxNzE3NjI5NDUxLCJleHAiOjE3MTc3MTU4NTF9.E4e5r-swU971NiqvBFs0K5TEA0u-VKDOLZjB-X7H26Y",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:7777/arabeLanguage/student/studentInfo",
+							"host": [
+								"localhost"
+							],
+							"port": "7777",
+							"path": [
+								"arabeLanguage",
+								"student",
+								"studentInfo"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Add language",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"idLang\":\"6\",\r\n    \"linguistic\":\"vocabulaire\",\r\n    \"language\":\"anglais\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:7777/arabeLanguage/languages",
+					"host": [
+						"localhost"
+					],
+					"port": "7777",
+					"path": [
+						"arabeLanguage",
+						"languages"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -13,7 +13,7 @@ export class UserService implements OnModuleInit {
   async onModuleInit() {
     // Consume Data with Spcific topic
     await this.consumerService.consume('user-consumer',
-      { topics: ['user_created'] },
+      { topics: ['user_created_2'] },
       {
         eachMessage: async ({ topic, partition, message }) => {
             const messageString = message.value.toString();
@@ -33,7 +33,7 @@ export class UserService implements OnModuleInit {
     );
 
     await this.consumerService.consume('deleteProf-consumer',
-    { topics: ['delete_prof'] },
+    { topics: ['delete_prof_2'] },
     {
       eachMessage: async ({ topic, partition, message }) => {
           const messageString = message.value.toString();

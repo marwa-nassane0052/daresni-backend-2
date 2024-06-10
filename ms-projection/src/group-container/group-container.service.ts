@@ -13,8 +13,8 @@ export class GroupContainerService implements OnModuleInit {
         @InjectModel(GroupContainer.name) private groupContainerModel:Model<GroupContainer>
         ) {}
     async onModuleInit() {
-        await this.consumerService.consume('new_groupContainer_consumer',
-          { topics: ['new_croupContainer_created'] },
+        await this.consumerService.consume('groupContainer-consumer8',
+          { topics: ['groupContainer_created_event'] },
           {
             eachMessage: async ({ topic, partition, message }) => {
 
@@ -48,7 +48,7 @@ export class GroupContainerService implements OnModuleInit {
         );
 
         await this.consumerService.consume('validateGroup-consumer',
-          { topics: ['validate_group'] },
+          { topics: ['validate_group_2'] },
           {
             eachMessage: async ({ topic, partition, message }) => {
 

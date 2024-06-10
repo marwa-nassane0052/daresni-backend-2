@@ -18,7 +18,7 @@ async function createForum(req, res) {
         res.status(201).json(newForum);
     } catch (error) {
         // Handle errors
-        console.error("Error creating forum:", error);
+        console.log(error);
         res.status(500).json({ error: "Unable to create forum" });
     }
 

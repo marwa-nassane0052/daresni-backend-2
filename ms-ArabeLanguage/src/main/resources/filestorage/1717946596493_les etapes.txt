@@ -1,0 +1,17 @@
+
+01- admin add level
+02- student get available languages
+03- student incript in language
+04- start study (next)
+05- download exam of his level ( y7alah)
+06- upload solution of exam 
+07- admin get liste of levels 
+08- admin can update level -> get level By Name +  update level By Name
+09- admin get liste of submissons in level 
+10- admin download solution of each student
+11- admin upgrade level of student 
+
+--> in addition : when student finished a language , id of this language marked in his compte --> we can color the
+ raw of this language as donne 
+
+--> student information 
