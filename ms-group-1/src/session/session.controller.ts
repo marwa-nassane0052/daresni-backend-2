@@ -51,7 +51,7 @@ export class SessionController {
                     ]
                 })
                 await this.producerService.produce({
-                    topic: 'session_notification_new',
+                    topic: 'session_notification_new_2',
                     messages: [
                         {
                             value: JSON.stringify({
@@ -93,7 +93,7 @@ export class SessionController {
                     ]
                 })
                 await this.producerService.produce({
-                    topic: 'session_notification_new',
+                    topic: 'session_notification_new_2',
                     messages: [
                         {
                             value: JSON.stringify({
@@ -113,9 +113,14 @@ export class SessionController {
 
     }
 
+
+    
+
+    
+
     //validate group container
     //add axios in this part
-    @Post("/validateGroupContainer/:idGC")
+    @Post("validateGroupContainer/:idGC")
     //@UseGuards(AuthGuard,AdminGuard)
     async validateGroupContainer(@Param('idGC') idGC: string, @Res() res: Response) {
         try {
@@ -132,7 +137,7 @@ export class SessionController {
             })
 
             await this.producerService.produce({
-                topic: 'validate_session_notification',
+                topic: 'validate_session_notification_2',
                 messages: [
                     {
                         value: JSON.stringify({
@@ -240,7 +245,7 @@ export class SessionController {
                 ]
             })
             await this.producerService.produce({
-                topic: 'refuse_session_notification',
+                topic: 'refuse_session_notification_2',
                 messages: [
                     {
                         value: JSON.stringify({

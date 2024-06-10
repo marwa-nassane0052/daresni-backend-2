@@ -12,7 +12,7 @@ export class ProfService implements OnModuleInit {
         ) {}
     async onModuleInit() {
         await this.consumerService.consume('prof-consumer',
-      { topics: ['prof_created_notification'] },
+      { topics: ['prof_created_notification_2'] },
       {
         eachMessage: async ({ topic, partition, message }) => {
             const messageString = message.value.toString();

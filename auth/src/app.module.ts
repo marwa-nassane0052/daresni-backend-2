@@ -20,7 +20,7 @@ import { KafkaModule } from './kafka/kafka.module';
     KafkaModule,
     AuthModule,
     UserModule,
-    MongooseModule.forRoot(process.env.MONGODB_URL2)
+    MongooseModule.forRoot(process.env.MONGODB_URL)
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -63,17 +63,21 @@ export class SessionService {
     }
 
     async findGroupContainer(profId:string,CreateGcDto:CreateGcDto):Promise<GroupContainer>{
-        const groupContainer=await this.groupContainer.findOne({
+        const data={
             moduleName:CreateGcDto.moduleName,
             profId:profId,
             year:CreateGcDto.year,  
-            speciality:CreateGcDto.speciality,
             studentNumber:CreateGcDto.studentNumber,
             price:CreateGcDto.price,
             sessionsNumberPerWeek:CreateGcDto.sessionsNumberPerWeek,
             studyDuration:CreateGcDto.studyDuration,
             sessionDuration:CreateGcDto.sessionDuration
-        })
+        }
+        if(CreateGcDto.speciality){
+            data["speciality"]=CreateGcDto.speciality
+        }
+        console.log(data)
+        const groupContainer=await this.groupContainer.findOne(data)
         return groupContainer
     }
     //validate session

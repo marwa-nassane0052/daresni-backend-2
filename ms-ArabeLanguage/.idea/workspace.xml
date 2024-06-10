@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c6007e13-1bd2-4b77-a8d8-9fb0a86e7d62" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../auth/src/app.module.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../auth/src/app.module.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth/src/auth/auth.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../auth/src/auth/auth.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../auth/src/kafka/producer/producer.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../auth/src/kafka/producer/producer.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717896476769_CC3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717899461371_logotp8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717900462277_logotp8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717900794793_voicenote.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717901012981_voicenote.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717901183599_voicenote.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717930628964_logotp8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717930635711_logotp8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717930649278_logotp8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717930655314_logotp8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717930729230_logotp8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717930735007_logotp8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ms-ArabeLanguage/src/main/resources/filestorage/1717930955781_logotp8.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/API/AdminController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/API/StudentController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/DTO/Admin/DetailLevelAdminDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/DTO/Admin/StudentDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/DTO/Admin/UpdateLevelDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/DTO/LanguageDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/DTO/ListLevelsDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/DTO/StepDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/DTO/Student/DetailLevelStudentDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/DTO/Student/languageDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/MsArabeLanguageApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/entities/Class/Language.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/entities/Class/Level.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/entities/Class/Step.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/entities/Class/Student.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/entities/Class/StudentInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/entities/Enum/LanguageEnum.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/entities/Enum/Linguistic.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/entities/Projection/LevelProjection.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/fileManagement/FileUploadProperties.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/fileManagement/exception/FileExceptionAdvice.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/fileManagement/exception/FileNotFoundException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/fileManagement/exception/FileStorageException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/fileManagement/model/FileResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/fileManagement/model/ResponseError.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/fileManagement/service/FileSystemStorageService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/fileManagement/service/IFileSytemStorage.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/models/StudentAuth.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/models/StudentAuthInfo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/proxies/StudentProxy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/repositories/LanguageRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/esisba/msarabelanguage/repositories/StudentRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/filestorage/1717858445481_BDA.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/filestorage/1717858594412_Tp8_MicroService_K8S_2024.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/filestorage/1717858651389_Tp8_MicroService_K8S_2024.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/filestorage/1717858948406_BDA.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/filestorage/1717862459985_BDA.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/esisba/msarabelanguage/MsArabeLanguageApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ms-group-1/src/session/session.controller.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../ms-group-1/src/session/session.controller.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ms-group-1/src/session/session.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../ms-group-1/src/session/session.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ms-notification/src/prof/prof.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../ms-notification/src/prof/prof.service.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ms-notification/src/session-notification/session-notification.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../ms-notification/src/session-notification/session-notification.service.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="Use Maven wrapper" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2fxzNBjCUWvuqsy4jTREivW9YxX" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.MsArabeLanguageApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/marwa/Desktop/backend/Registry&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.tools&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="MsArabeLanguageApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="ms-ArabeLanguage" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.esisba.msarabelanguage.MsArabeLanguageApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-17.0.10-corretto-17.0.10-4caba194b151-ab7203c4" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c6007e13-1bd2-4b77-a8d8-9fb0a86e7d62" name="Changes" comment="" />
+      <created>1714757476620</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1714757476620</updated>
+      <workItem from="1714757481667" duration="1578000" />
+      <workItem from="1717755201900" duration="10732000" />
+      <workItem from="1717895393139" duration="6376000" />
+      <workItem from="1717926967692" duration="706000" />
+      <workItem from="1717929761235" duration="14841000" />
+      <workItem from="1717957636196" duration="5960000" />
+      <workItem from="1718017291116" duration="1677000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

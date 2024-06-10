@@ -73,7 +73,7 @@ export class AuthController {
     ]
     })
     await this.producerService.produce({
-      topic:'prof_created_notification',
+      topic:'prof_created_notification_2',
       messages:[
         {
             value:JSON.stringify({
