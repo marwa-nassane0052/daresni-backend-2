@@ -12,9 +12,9 @@ import com.esisba.msarabelanguage.repositories.LanguageRepository;
 import com.esisba.msarabelanguage.repositories.StudentRepository;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -202,7 +202,7 @@ public class StudentController {
 
 
     //4 upload examSolution
-    @PostMapping("/{idLang}/uploadExamSolution")
+    @PostMapping(value = "/{idLang}/uploadExamSolution" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<String> uploadExamSolution(@RequestHeader("Authorization") String token, @PathVariable("idLang") String idLang, @RequestParam MultipartFile solutionFile) {
         try {
             Student student = studentRepository.findByIdStudent(studentProxy.getEtudiant(token).getId());
@@ -299,9 +299,6 @@ public class StudentController {
         StudentAuth studentAuth = studentProxy.getEtudiant(token);
         return studentRepository.findByIdStudent(studentAuth.getId());
     }
-
-
-
 
 
 

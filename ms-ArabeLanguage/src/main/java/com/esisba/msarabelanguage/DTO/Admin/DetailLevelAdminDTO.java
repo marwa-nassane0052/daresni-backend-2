@@ -15,5 +15,6 @@ public class DetailLevelAdminDTO {
     private Linguistic linguistic;
     private LanguageEnum language;
     private List<Step> steps;
-    private String examnPath;
+    private String examFile;
 }
+

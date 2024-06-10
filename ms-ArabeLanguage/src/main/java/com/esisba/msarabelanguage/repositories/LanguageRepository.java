@@ -11,6 +11,5 @@ public interface LanguageRepository extends MongoRepository<Language, String> {
 
     Language findByLanguageAndLinguistic(LanguageEnum language, Linguistic linguistic);
     Language findByIdLang(String id);
-
-    Language findLanguageByLanguageAndStudentInfos(String L,String s);
+    Boolean existsLanguageByLanguageAndLinguistic(LanguageEnum language, Linguistic linguistic);
 }

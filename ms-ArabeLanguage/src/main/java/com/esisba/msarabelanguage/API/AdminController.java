@@ -6,8 +6,6 @@ import com.esisba.msarabelanguage.DTO.Admin.UpdateLevelDTO;
 import com.esisba.msarabelanguage.DTO.ListLevelsDTO;
 import com.esisba.msarabelanguage.entities.Class.*;
 import com.esisba.msarabelanguage.fileManagement.service.IFileSytemStorage;
-import com.esisba.msarabelanguage.models.StudentAuth;
-import com.esisba.msarabelanguage.models.StudentAuthInfo;
 import com.esisba.msarabelanguage.proxies.StudentProxy;
 import com.esisba.msarabelanguage.repositories.LanguageRepository;
 import com.esisba.msarabelanguage.repositories.StudentRepository;
@@ -16,15 +14,18 @@ import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.support.Repositories;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,59 +48,61 @@ public class AdminController {
 
     @Autowired
     StudentRepository studentRepository;
-
+    private Repositories repositories;
 
 
     /************************************************** Admin **************************************************************/
 
 
-    @PostMapping(value = "/addLevel" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @CrossOrigin(origins = "http://localhost:3000")
-    public ResponseEntity<String> addLevel(@RequestParam("level") String levelJson, @RequestParam("examFile") MultipartFile examFile) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        DetailLevelAdminDTO levelDTO;
-        try {
-            levelDTO = objectMapper.readValue(levelJson, DetailLevelAdminDTO.class);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid JSON format");
-        }
-
-        Language language = languageRepository.findByLanguageAndLinguistic(levelDTO.getLanguage(), levelDTO.getLinguistic());
-
-        // Check if language exists
-        if (language == null) {
-            language = new Language();
-            language.setLanguage(levelDTO.getLanguage());
-            language.setLinguistic(levelDTO.getLinguistic());
-            language.setLevels(new ArrayList<>());
-            languageRepository.save(language);
-        }
-
-        // Check if a level with the same name already exists
-        boolean levelExists = language.getLevels().stream()
-                .anyMatch(existingLevel -> existingLevel.getName().equalsIgnoreCase(levelDTO.getName()));
-        if (levelExists) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("A level with the same name already exists");
-        }
-
-        // Create and add new level
-        Level level = new Level();
-        level.setName(levelDTO.getName());
-        level.setSteps(levelDTO.getSteps());
-
-        // Upload exam
-        String upfile = fileSytemStorage.saveFile(examFile);
-        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/student/download/")
-                .path(upfile)
-                .toUriString();
-        level.setExamFile(upfile);
-
-        language.getLevels().add(level);
-        languageRepository.save(language);
-
-        return ResponseEntity.ok("Level added successfully");
+@PostMapping(value = "/addLevel" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ResponseEntity<String> addLevel(@RequestParam("level") String levelJson, @RequestParam("examFile") MultipartFile examFile) {
+    ObjectMapper objectMapper = new ObjectMapper();
+    DetailLevelAdminDTO levelDTO;
+    try {
+        levelDTO = objectMapper.readValue(levelJson, DetailLevelAdminDTO.class);
+    } catch (IOException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid JSON format");
     }
+
+    Language language = languageRepository.findByLanguageAndLinguistic(levelDTO.getLanguage(), levelDTO.getLinguistic());
+
+    // Check if language exists
+    if (language == null) {
+        language = new Language();
+        language.setLanguage(levelDTO.getLanguage());
+        language.setLinguistic(levelDTO.getLinguistic());
+        language.setLevels(new ArrayList<>());
+        languageRepository.save(language);
+    }
+
+    if (language.getLevels()==null){
+        language.setLevels(new ArrayList<>());
+    }
+    // Check if a level with the same name already exists
+    boolean levelExists = language.getLevels().stream()
+            .anyMatch(existingLevel -> existingLevel.getName().equalsIgnoreCase(levelDTO.getName()));
+    if (levelExists) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("A level with the same name already exists");
+    }
+
+    // Create and add new level
+    Level level = new Level();
+    level.setName(levelDTO.getName());
+    level.setSteps(levelDTO.getSteps());
+
+    // Upload exam
+    String upfile = fileSytemStorage.saveFile(examFile);
+    String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+            .path("/student/download/")
+            .path(upfile)
+            .toUriString();
+    level.setExamFile(upfile);
+
+    language.getLevels().add(level);
+    languageRepository.save(language);
+
+    return ResponseEntity.ok("Level added successfully");
+}
 
 
 
@@ -107,7 +110,6 @@ public class AdminController {
 
     //2 get List Of Levels (All)
     @GetMapping("/levels/all")
-    @CrossOrigin(origins = "http://localhost:3000")
     List<ListLevelsDTO> getlevels() {
 
         List<ListLevelsDTO> levelDTOs = new ArrayList<>();
@@ -130,7 +132,6 @@ public class AdminController {
 
     //3 get Level
     @GetMapping("{idLang}/levels/{nameLevel}")
-    @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<?> getLevel(@PathVariable("idLang") String idLang, @PathVariable("nameLevel") String nameLevel) {
         try {
             Language language = languageRepository.findByIdLang(idLang);
@@ -148,7 +149,7 @@ public class AdminController {
             levelDTO.setName(level.getName());
             levelDTO.setLinguistic(language.getLinguistic());
             levelDTO.setLanguage(language.getLanguage());
-            levelDTO.setExamnPath(level.getExamFile());
+            levelDTO.setExamFile(level.getExamFile());
             levelDTO.setSteps(level.getSteps());
             return ResponseEntity.ok(levelDTO);
         } catch (Exception e) {
@@ -159,35 +160,145 @@ public class AdminController {
 
     //4 update (put / patch) level
 
-    @PutMapping("{idLang}/levels/{nameLevel}/update")
-    public ResponseEntity<?> updateLevel(@PathVariable("nameLevel") String nameLevel, @PathVariable("idLang") String idLang, @RequestBody UpdateLevelDTO updates) {
+    @PutMapping(value = "{idLang}/levels/{nameLevel}/update" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateLevel(@PathVariable("nameLevel") String nameLevel, @PathVariable("idLang") String idLang, @RequestParam String updatesJson , @RequestParam(required = false) MultipartFile file) {
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            UpdateLevelDTO updates;
+            try {
+                updates = objectMapper.readValue(updatesJson, UpdateLevelDTO.class);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid JSON format");
+            }
+
             Language language = languageRepository.findByIdLang(idLang);
-            if (language == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Language not found");
+
+            // Check if a language  with the same name already exists
+            if (!updates.getLanguage().equals(language.getLanguage()) || !updates.getLinguistic().equals(language.getLinguistic())) {
+                boolean languageExists = languageRepository.existsLanguageByLanguageAndLinguistic(updates.getLanguage(), updates.getLinguistic());
+                if (languageExists) { //language exist
+                    Language languageExist = languageRepository.findByLanguageAndLinguistic(updates.getLanguage(), updates.getLinguistic());
+
+                    // Check if a level with the same name already exists
+                    boolean levelExists = languageExist.getLevels().stream()
+                                .anyMatch(existingLevel -> existingLevel.getName().equalsIgnoreCase(updates.getName()));
+                    if (levelExists) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT).body("A level with the same name already exists");
+                    }
+
+                        Level newLevel = new Level();
+                        newLevel.setName(updates.getName());
+                        newLevel.setSteps(updates.getSteps());
+
+                        if (file != null){ // file updated
+                            // Upload exam
+                            String upfile = fileSytemStorage.saveFile(file);
+                            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                                    .path("/student/download/")
+                                    .path(upfile)
+                                    .toUriString();
+                            newLevel.setExamFile(upfile);
+                        }else{// file not updated
+                            newLevel.setExamFile(updates.getExamnFile());
+                        }
+
+                        languageExist.getLevels().add(newLevel);
+                        languageRepository.save(languageExist);
+
+                        Optional<Level> levelToRemove = language.getLevels().stream()
+                                .filter(levelExist -> levelExist.getName().equalsIgnoreCase(nameLevel))
+                                .findFirst();
+
+                        if (levelToRemove.isPresent()) {
+                            language.getLevels().remove(levelToRemove.get());
+                            languageRepository.save(language);
+                        } else {
+                            System.out.println("Level not found: " + nameLevel);
+                        }
+                        return ResponseEntity.ok("Level updated successfully");
+
+                } else { // language not exist
+                    Language newLanguage = new Language();
+                    newLanguage.setLanguage(updates.getLanguage());
+                    newLanguage.setLinguistic(updates.getLinguistic());
+                    Level newLevel = new Level();
+                    newLevel.setName(updates.getName());
+                    newLevel.setSteps(updates.getSteps());
+                    if (file != null){ // file updated
+                        // Upload exam
+                        String upfile = fileSytemStorage.saveFile(file);
+                        String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                                .path("/student/download/")
+                                .path(upfile)
+                                .toUriString();
+                        newLevel.setExamFile(upfile);
+                    }else{// file not updated
+                        newLevel.setExamFile(updates.getExamnFile());
+                    }
+
+                    List<Level> newLevels = new ArrayList<>();
+                    newLevels.add(newLevel);
+                    newLanguage.setLevels(newLevels);
+                    languageRepository.save(newLanguage);
+
+                    Optional<Level> levelToRemove = language.getLevels().stream()
+                            .filter(levelExist -> levelExist.getName().equalsIgnoreCase(nameLevel))
+                            .findFirst();
+
+                    if (levelToRemove.isPresent()) {
+                        language.getLevels().remove(levelToRemove.get());
+                        languageRepository.save(language);
+                    } else {
+                        System.out.println("Level not found: " + nameLevel);
+                    }
+                    return ResponseEntity.ok("Level updated successfully");
+
+                }
+            } else {  // language same as 1st time
+
+                // Check if a level with the same name already exists
+                if (!updates.getName().equals(nameLevel)) {
+                    boolean levelExists = language.getLevels().stream()
+                            .anyMatch(existingLevel -> existingLevel.getName().equalsIgnoreCase(updates.getName()));
+                    if (levelExists) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT).body("A level with the same name already exists");
+                    }
+                }
+                Optional<Level> levelOptional = language.getLevels().stream()
+                        .filter(levelExist -> levelExist.getName().equalsIgnoreCase(nameLevel))
+                        .findFirst();
+
+                if (!levelOptional.isPresent()) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Level not found");
+                }
+
+                Level level = levelOptional.get();
+                // Replace the old level with the updated one in the list
+                int index = language.getLevels().indexOf(level);
+
+                level.setName(updates.getName());
+                level.setSteps(updates.getSteps());
+
+                if (file != null){ // file updated
+                    // Upload exam
+                    String upfile = fileSytemStorage.saveFile(file);
+                    String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                            .path("/student/download/")
+                            .path(upfile)
+                            .toUriString();
+                    level.setExamFile(upfile);
+                }else{// file not updated
+                    level.setExamFile(updates.getExamnFile());
+                }
+
+                language.getLevels().set(index, level);
+                // Save the updated language back to the repository
+                languageRepository.save(language);
+
+                return ResponseEntity.ok("Level updated successfully");
             }
 
-            Optional<Level> levelOptional = language.getLevels().stream()
-                    .filter(levelExist -> levelExist.getName().equalsIgnoreCase(nameLevel))
-                    .findFirst();
 
-            if (!levelOptional.isPresent()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Level not found");
-            }
-
-            Level level = levelOptional.get();
-            // Replace the old level with the updated one in the list
-            int index = language.getLevels().indexOf(level);
-
-            level.setName(updates.getName());
-            level.setSteps(updates.getSteps());
-            level.setExamFile(updates.getExamnPath());
-            language.getLevels().set(index, level);
-
-            // Save the updated language back to the repository
-            languageRepository.save(language);
-
-            return ResponseEntity.ok("Level updated successfully");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid update data: " + e.getMessage());
         } catch (Exception e) {
@@ -220,8 +331,8 @@ public class AdminController {
             if (updates.getSteps() != null ) {
                 level.setSteps(updates.getSteps());
             }
-            if (updates.getExamnPath() != null ) {
-                level.setExamFile(updates.getExamnPath());
+            if (updates.getExamnFile() != null ) {
+                level.setExamFile(updates.getExamnFile());
 
             }
 
@@ -239,9 +350,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while updating the level: " + e.getMessage());
         }
     }
-    //5 liste of submissions
-
-    //5 liste of submissions
+     //5 liste of submissions
 
     @GetMapping("/{idLang}/{levelName}/submissions")
     ResponseEntity<?> getStudents(@PathVariable("idLang") String idLang , @PathVariable("levelName") String levelName ) {
@@ -250,7 +359,9 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("language not found");
         }
         List<StudentInfo> studentInfos = language.getStudentInfos();
-
+        if (studentInfos == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+        }
 
         Optional<Level> studentlevelOp = language.getLevels().stream()
                 .filter(levelexist -> levelexist.getName().equalsIgnoreCase(levelName))
@@ -261,14 +372,13 @@ public class AdminController {
         }
 
         Level studentlevel = studentlevelOp.get();
-
         List<StudentDTO> students = new ArrayList<>();
         for( StudentInfo studentInfo : studentInfos) {
-           StudentAuthInfo student = studentProxy.getStudentInfo(studentInfo.getIdStudent());
-            if ( studentInfo.getCurrentLevel() == language.getLevels().indexOf(studentlevel)) {
-
+            Student student = studentRepository.findByIdStudent(studentInfo.getIdStudent());
+            if (studentInfo.getSolutionFile() != null && studentInfo.getCurrentLevel() == language.getLevels().indexOf(studentlevel)) {
                 StudentDTO studentDTO = new StudentDTO();
-                studentDTO.setIdStudent(student.getUser());
+
+                studentDTO.setIdStudent(student.getIdStudent());
                 studentDTO.setEmail(student.getEmail());
                 studentDTO.setLanguage(language.getLanguage());
                 studentDTO.setLinguistic(language.getLinguistic());
@@ -284,6 +394,8 @@ public class AdminController {
         }
         return ResponseEntity.ok(students);
     }
+
+
 
     //6 upgrade student level
     @PostMapping("{idLang}/submissions/{idStudent}/upgradeLevel")
@@ -358,5 +470,27 @@ public class AdminController {
     }
 
 
+    // display file
+    @GetMapping("/display/{filename:.+}")
+    public ResponseEntity<org.springframework.core.io.Resource> displayFile(@PathVariable String filename) {
+        org.springframework.core.io.Resource resource;
+        try {
+            resource = fileSytemStorage.loadFile(filename);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found", e);
+        }
+
+        String contentType = "application/octet-stream";
+        try {
+            contentType = Files.probeContentType(resource.getFile().toPath());
+        } catch (IOException ex) {
+            // Could not determine file type, default to "application/octet-stream"
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
 
 }
