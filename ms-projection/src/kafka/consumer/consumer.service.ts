@@ -4,7 +4,7 @@ import { Kafka, Consumer, ConsumerRunConfig, ConsumerSubscribeTopics } from 'kaf
 @Injectable()
 export class ConsumerService implements  OnApplicationShutdown {
     private readonly Kafka = new Kafka({
-        brokers: ['localhost:9092']
+        brokers: ['kafka:9092']
     });
     private readonly consumers: Map<string, Consumer> = new Map(); // Use a Map to store consumers with groupId as key
 

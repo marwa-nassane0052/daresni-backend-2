@@ -49,6 +49,29 @@ spring:
             - RewritePath=/ms-forumMessagerie/(?<s>.*), /${s}
           uri: lb://ms-forumMessagerie
 
+        - id: route5
+          predicates:
+            - Path=/ms-projection/**
+          filters:
+            - RewritePath=/ms-projection/(?<s>.*), /${s}
+          uri: lb://ms-projection
+
+        - id: route6
+          predicates:
+            - Path=/ms-notification/**
+          filters:
+            - RewritePath=/ms-notification/(?<s>.*), /${s}
+          uri: lb://ms-notification
+
+        - id: route7
+          predicates:
+            - Path=/ms-payment/**
+          filters:
+            - RewritePath=/ms-paymant/(?<s>.*), /${s}
+          uri: lb://ms-payment
+
+
+
 eureka:
   client:
     register-with-eureka: true

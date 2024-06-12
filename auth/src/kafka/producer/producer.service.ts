@@ -10,7 +10,7 @@ export class ProducerService implements OnModuleInit{
  private readonly producer: Producer = this.kafka.producer();
 
   async onModuleInit() {
-    // Connect Producer on Module initialization
+     //Connect Producer on Module initialization
     await this.producer.connect();
   }
 

@@ -1,0 +1,4 @@
+FROM openjdk:17-jdk-alpine
+COPY target/paiment-ms*.jar paiment-ms.jar
+CMD java -jar /paiment-ms.jar
+EXPOSE 8083

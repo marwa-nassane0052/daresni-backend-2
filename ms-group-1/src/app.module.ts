@@ -19,6 +19,18 @@ import { KafkaModule } from './kafka/kafka.module';
       }
     ),
     MongooseModule.forRoot(process.env.MONGODB_URL),
+    EurekaModule.forRoot({
+      eureka:{
+        host: process.env.EUREKA_SERVER_HOST ||'localhost',
+        port: process.env.EUREKA_SERVER_PORT ||8888,
+        registryFetchInterval: 1000,
+        maxRetries: 3,
+      },
+      service:{
+        name:"ms-group",
+        port:3001
+      }
+    }),
  
     SessionModule,
     
@@ -33,18 +45,3 @@ import { KafkaModule } from './kafka/kafka.module';
 })
 export class AppModule {}
 
-/*
- 
-  EurekaModule.forRoot({
-      eureka:{
-        host: 'localhost',
-        port: 8888,
-        registryFetchInterval: 1000,
-        maxRetries: 3,
-      },
-      service:{
-        name:"ms-group",
-        port:3001
-      }
-    }),
- */
