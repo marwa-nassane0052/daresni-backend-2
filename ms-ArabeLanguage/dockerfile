@@ -1,0 +1,4 @@
+FROM openjdk:17-jdk-alpine
+COPY target/ms-ArabeLanguage*.jar ms-ArabeLanguage.jar
+CMD java -jar /ms-ArabeLanguage.jar
+EXPOSE 8090

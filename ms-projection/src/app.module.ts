@@ -10,28 +10,21 @@ import { GroupContainerModule } from './group-container/group-container.module';
 import { EurekaModule } from 'nestjs-eureka';
 
 @Module({
-  imports: [MongooseModule.forRoot('mongodb://localhost:27017/ms-projection'), KafkaModule, GroupModule, UserModule, GroupContainerModule],  
-  controllers: [AppController],
-  providers: [AppService,ConsumerService],
-})
-export class AppModule {}
-
-/*
-
-EurekaModule.forRoot({
+  imports: [MongooseModule.forRoot(process.env.MONGODB_URL), KafkaModule, GroupModule, UserModule, GroupContainerModule,
+  EurekaModule.forRoot({
     eureka:{
-      host: 'localhost',
-      port: 8888,
+      host:process.env.EUREKA_SERVER_HOST || 'localhost',
+      port: process.env.EUREKA_SERVER_PORT ||8888,
       registryFetchInterval: 1000,
       maxRetries: 3,
     },
     service:{
       name:"ms-projection",
-      port:3005
+      port:3006
     }
-  }),
+  }),],  
+  controllers: [AppController],
+  providers: [AppService,ConsumerService],
+})
+export class AppModule {}
 
-],
-
-
-*/
