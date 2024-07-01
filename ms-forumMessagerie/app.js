@@ -22,7 +22,7 @@ const io = socketIo(server, {
 });
 
 // Configure MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URL || 'mongodb+srv://mnassane:123456789Marwa@cluster0.9hn0nt1.mongodb.net/ms-forume?retryWrites=true&w=majority&appName=Cluster0';
+const MONGODB_URI = process.env.MONGODB_URI;
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(error => console.error('Error connecting to MongoDB:', error));

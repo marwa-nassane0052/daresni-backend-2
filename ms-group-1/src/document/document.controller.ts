@@ -60,7 +60,7 @@ export class DocumentController {
   async getFileContent(@Param('filename') filename: string, @Res() res: Response) {
     try {
       // Construct the absolute file path
-      const filePath = path.resolve(`/home/marwa/Desktop/backend/ms-group-1/upload/${filename}`);
+      const filePath = path.resolve(`C:\\Users\\pc\\Desktop\\projet3\\daresni-backend-2\\ms-group-1\\upload\\${filename}`);
 
    
     

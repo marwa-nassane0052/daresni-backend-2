@@ -2,7 +2,7 @@ const axios = require('axios');
 
 async function getUser(token) {
   try {
-    const response = await axios.get("http://localhost:3000/auth/getInfoUser", {
+    const response = await axios.get("http://localhost:3001/auth/getInfoUser", {
       headers: {
         Authorization: token,
       },

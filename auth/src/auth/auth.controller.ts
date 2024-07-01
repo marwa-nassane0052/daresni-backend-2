@@ -114,7 +114,7 @@ async getDocuments(@Param('idP') idP:string){
 async getFileContent(@Param('filename') filename: string, @Res() res: Response) {
   try {
     // Construct the absolute file path
-    const filePath = path.resolve(`/home/marwa/Desktop/backend/auth/uploads/${filename}`);
+    const filePath = path.resolve(`C:\\Users\\pc\\Desktop\\projet3\\daresni-backend-2\\auth\\uploads\\${filename}`);
     // Send the file
     res.sendFile(filePath);
   } catch (err) {

@@ -15,7 +15,7 @@ import { SessionNotificationModule } from './session-notification/session-notifi
         isGlobal: true
       }
     ),
-    MongooseModule.forRoot(process.env.MONGODB_URL),
+    MongooseModule.forRoot("mongodb://localhost:27017/ms-notification"),
     ProfModule,
     SessionNotificationModule
   ],
